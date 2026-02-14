@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Converter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>⚡ Media Converter</h1>
+      <p class="subtitle">Drag & drop files to convert</p>
+    </header>
+
+    <div id="dropZone" class="drop-zone">
+      <div class="drop-icon">📁</div>
+      <p>Drop media files here</p>
+      <span class="drop-hint">or click to browse</span>
+      <input type="file" id="fileInput" multiple accept="video/*,audio/*" hidden>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Output Format</label>
+        <select id="formatSelect">
+          <optgroup label="Video">
+            <option value="mp4">MP4</option>
+            <option value="mkv">MKV</option>
+            <option value="avi">AVI</option>
+            <option value="mov">MOV</option>
+            <option value="webm">WebM</option>
+          </optgroup>
+          <optgroup label="Audio">
+            <option value="mp3">MP3</option>
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+            <option value="aac">AAC</option>
+            <option value="ogg">OGG</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Quality</label>
+        <select id="qualitySelect">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="lossless">Lossless</option>
+        </select>
+      </div>
+      <button id="clearBtn" class="btn btn-secondary">Clear Done</button>
+    </div>
+
+    <div id="jobList" class="job-list"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
