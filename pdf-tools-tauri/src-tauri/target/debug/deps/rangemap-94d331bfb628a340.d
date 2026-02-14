@@ -1,0 +1,12 @@
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/rangemap-94d331bfb628a340.d: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_map.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_set.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/map.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/operations.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/set.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/range_wrapper.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/std_ext.rs
+
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/librangemap-94d331bfb628a340.rmeta: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_map.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_set.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/map.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/operations.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/set.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/range_wrapper.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/std_ext.rs
+
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/lib.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_map.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/inclusive_set.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/map.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/operations.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/set.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/range_wrapper.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rangemap-1.7.1/src/std_ext.rs:

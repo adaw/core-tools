@@ -1,0 +1,11 @@
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/av1_grain-a19659ef42ff9457.d: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/create.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver/util.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/parse.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/util.rs
+
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/libav1_grain-a19659ef42ff9457.rmeta: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/create.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver/util.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/parse.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/util.rs
+
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/lib.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/create.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/diff/solver/util.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/parse.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/av1-grain-0.2.5/src/util.rs:

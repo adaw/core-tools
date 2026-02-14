@@ -1,0 +1,14 @@
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/uuid-9b3cd1d567c8ddc4.d: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/macros.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/builder.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/error.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/non_nil.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/parser.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/fmt.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/timestamp.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external/serde_support.rs
+
+/Users/lex/repos/core-tools/pdf-tools-tauri/src-tauri/target/debug/deps/libuuid-9b3cd1d567c8ddc4.rmeta: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/lib.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/macros.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/builder.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/error.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/non_nil.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/parser.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/fmt.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/timestamp.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external.rs /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external/serde_support.rs
+
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/lib.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/macros.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/builder.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/error.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/non_nil.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/parser.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/fmt.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/timestamp.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external.rs:
+/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.21.0/src/external/serde_support.rs:
