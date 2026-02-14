@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --bg3: #0f3460;
+      --accent: #00ff88;
+      --accent2: #00cc6a;
+      --text: #e0e0e0;
+      --text2: #a0a0b0;
+      --danger: #ff4757;
+      --border: #2a2a4a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--bg2);
+      padding: 16px 24px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: 20px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    header .badge {
+      background: var(--bg3);
+      color: var(--accent);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--accent);
+    }
+    .tabs {
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab {
+      padding: 10px 18px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text); background: rgba(0,255,136,0.05); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .content { padding: 24px; max-width: 900px; margin: 0 auto; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel h2 { font-size: 18px; color: var(--accent); margin-bottom: 16px; }
+    .panel p.desc { color: var(--text2); font-size: 13px; margin-bottom: 20px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus { border-color: var(--accent); }
+    .field textarea { min-height: 80px; resize: vertical; }
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn + .btn { margin-left: 8px; }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(0,255,136,0.05);
+    }
+    .drop-zone .icon { font-size: 36px; margin-bottom: 8px; }
+    .file-list { margin: 16px 0; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      cursor: grab;
+    }
+    .file-item:active { cursor: grabbing; }
+    .file-item .name { flex: 1; font-size: 13px; }
+    .file-item .size { color: var(--text2); font-size: 12px; }
+    .file-item .remove { color: var(--danger); cursor: pointer; font-size: 16px; }
+    .result {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .result.success { background: rgba(0,255,136,0.1); border: 1px solid var(--accent); color: var(--accent); }
+    .result.error { background: rgba(255,71,87,0.1); border: 1px solid var(--danger); color: var(--danger); }
+    .thumbnails {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .thumb {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .thumb:hover { border-color: var(--accent); }
+    .thumb.selected { border-color: var(--accent); background: rgba(0,255,136,0.1); }
+    .thumb .page-preview {
+      width: 100%;
+      aspect-ratio: 210/297;
+      background: #fff;
+      border-radius: 3px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .thumb .page-num { font-size: 11px; color: var(--text2); }
+    .row { display: flex; gap: 12px; align-items: flex-end; }
+    .row .field { flex: 1; }
+    .actions { margin-top: 20px; display: flex; gap: 8px; }
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 6px 24px;
+      font-size: 12px;
+      color: var(--text2);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📄 PDF Tools</h1>
+    <span class="badge">CORE #7</span>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="merge">Merge</div>
+    <div class="tab" data-tab="split">Split</div>
+    <div class="tab" data-tab="compress">Compress</div>
+    <div class="tab" data-tab="convert">Convert</div>
+    <div class="tab" data-tab="rotate">Rotate</div>
+    <div class="tab" data-tab="text">Text</div>
+    <div class="tab" data-tab="watermark">Watermark</div>
+    <div class="tab" data-tab="security">Security</div>
+  </div>
+
+  <div class="content">
+    <!-- MERGE -->
+    <div class="panel active" id="panel-merge">
+      <h2>Merge PDFs</h2>
+      <p class="desc">Combine multiple PDF files into one. Drag to reorder.</p>
+      <div class="drop-zone" id="merge-drop">
+        <div class="icon">📎</div>
+        <div>Drop PDF files here or click to browse</div>
+      </div>
+      <div class="file-list" id="merge-files"></div>
+      <div class="field">
+        <label>Output file path</label>
+        <input type="text" id="merge-output" placeholder="/path/to/merged.pdf">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doMerge()">Merge PDFs</button>
+        <button class="btn btn-secondary" onclick="clearFiles('merge')">Clear</button>
+      </div>
+      <div id="merge-result"></div>
+    </div>
+
+    <!-- SPLIT -->
+    <div class="panel" id="panel-split">
+      <h2>Split PDF</h2>
+      <p class="desc">Split a PDF by page ranges (e.g. "1-3", "4-6", "7").</p>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="split-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div id="split-thumbnails" class="thumbnails"></div>
+      <div class="field">
+        <label>Page ranges (comma-separated, one per output file)</label>
+        <input type="text" id="split-ranges" placeholder="1-3, 4-6, 7-10">
+      </div>
+      <div class="field">
+        <label>Output directory</label>
+        <input type="text" id="split-output" placeholder="/path/to/output/">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doSplit()">Split PDF</button>
+        <button class="btn btn-secondary" onclick="loadThumbnails('split')">Load Preview</button>
+      </div>
+      <div id="split-result"></div>
+    </div>
+
+    <!-- COMPRESS -->
+    <div class="panel" id="panel-compress">
+      <h2>Compress PDF</h2>
+      <p class="desc">Reduce PDF file size by compressing internal streams.</p>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="compress-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div class="field">
+        <label>Output PDF</label>
+        <input type="text" id="compress-output" placeholder="/path/to/compressed.pdf">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doCompress()">Compress</button>
+      </div>
+      <div id="compress-result"></div>
+    </div>
+
+    <!-- CONVERT -->
+    <div class="panel" id="panel-convert">
+      <h2>Convert</h2>
+      <p class="desc">Convert between PDF and images.</p>
+      <div class="field">
+        <label>Mode</label>
+        <select id="convert-mode">
+          <option value="pdf2img">PDF → Images</option>
+          <option value="img2pdf">Images → PDF</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Input path(s) — one per line for images</label>
+        <textarea id="convert-input" placeholder="/path/to/file.pdf or image paths"></textarea>
+      </div>
+      <div class="field">
+        <label>Output path / directory</label>
+        <input type="text" id="convert-output" placeholder="/path/to/output">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doConvert()">Convert</button>
+      </div>
+      <div id="convert-result"></div>
+    </div>
+
+    <!-- ROTATE -->
+    <div class="panel" id="panel-rotate">
+      <h2>Rotate Pages</h2>
+      <p class="desc">Rotate specific pages by 90°, 180°, or 270°.</p>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="rotate-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div id="rotate-thumbnails" class="thumbnails"></div>
+      <div class="row">
+        <div class="field">
+          <label>Pages (comma-separated)</label>
+          <input type="text" id="rotate-pages" placeholder="1, 3, 5">
+        </div>
+        <div class="field">
+          <label>Degrees</label>
+          <select id="rotate-degrees">
+            <option value="90">90° CW</option>
+            <option value="180">180°</option>
+            <option value="270">270° CW</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Output PDF</label>
+        <input type="text" id="rotate-output" placeholder="/path/to/rotated.pdf">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doRotate()">Rotate</button>
+        <button class="btn btn-secondary" onclick="loadThumbnails('rotate')">Load Preview</button>
+      </div>
+      <div id="rotate-result"></div>
+    </div>
+
+    <!-- TEXT -->
+    <div class="panel" id="panel-text">
+      <h2>Extract Text</h2>
+      <p class="desc">Extract text content from PDF pages.</p>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="text-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div class="field">
+        <label>Pages (optional, comma-separated — leave empty for all)</label>
+        <input type="text" id="text-pages" placeholder="1, 2, 3">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doExtractText()">Extract Text</button>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Extracted text</label>
+        <textarea id="text-output" rows="12" readonly placeholder="Text will appear here..."></textarea>
+      </div>
+      <div id="text-result"></div>
+    </div>
+
+    <!-- WATERMARK -->
+    <div class="panel" id="panel-watermark">
+      <h2>Add Watermark</h2>
+      <p class="desc">Add a text watermark to all pages.</p>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="watermark-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div class="field">
+        <label>Watermark text</label>
+        <input type="text" id="watermark-text" placeholder="CONFIDENTIAL">
+      </div>
+      <div class="field">
+        <label>Output PDF</label>
+        <input type="text" id="watermark-output" placeholder="/path/to/watermarked.pdf">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doWatermark()">Add Watermark</button>
+      </div>
+      <div id="watermark-result"></div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="panel" id="panel-security">
+      <h2>Security</h2>
+      <p class="desc">Protect or remove protection from PDFs.</p>
+      <div class="field">
+        <label>Mode</label>
+        <select id="security-mode">
+          <option value="protect">Password Protect</option>
+          <option value="remove">Remove Protection</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Input PDF</label>
+        <input type="text" id="security-input" placeholder="/path/to/input.pdf">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="security-password" placeholder="Enter password">
+      </div>
+      <div class="field">
+        <label>Output PDF</label>
+        <input type="text" id="security-output" placeholder="/path/to/output.pdf">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doSecurity()">Apply</button>
+      </div>
+      <div id="security-result"></div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span id="status">Ready</span>
+    <span>PDF Tools v1.0.0</span>
+  </div>
+
+  <script>
+    // Check if Tauri is available
+    const invoke = window.__TAURI__?.core?.invoke || (async (cmd, args) => {
+      console.log('Tauri not available:', cmd, args);
+      throw new Error('Tauri runtime not available');
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // State
+    const mergeFiles = [];
+
+    function setStatus(msg) {
+      document.getElementById('status').textContent = msg;
+    }
+
+    function showResult(id, msg, isError) {
+      const el = document.getElementById(id);
+      el.className = 'result ' + (isError ? 'error' : 'success');
+      el.textContent = msg;
+    }
+
+    // MERGE
+    async function doMerge() {
+      const output = document.getElementById('merge-output').value;
+      if (!mergeFiles.length || !output) return showResult('merge-result', 'Please add files and set output path', true);
+      setStatus('Merging...');
+      try {
+        const result = await invoke('merge_pdfs', { paths: mergeFiles.map(f => f.path), output });
+        showResult('merge-result', result, false);
+        setStatus('Merge complete');
+      } catch (e) { showResult('merge-result', e, true); setStatus('Error'); }
+    }
+
+    function clearFiles(section) {
+      if (section === 'merge') {
+        mergeFiles.length = 0;
+        document.getElementById('merge-files').innerHTML = '';
+      }
+    }
+
+    function renderMergeFiles() {
+      const el = document.getElementById('merge-files');
+      el.innerHTML = mergeFiles.map((f, i) => `
+        <div class="file-item" draggable="true" data-index="${i}">
+          <span>☰</span>
+          <span class="name">${f.name}</span>
+          <span class="size">${f.size}</span>
+          <span class="remove" onclick="mergeFiles.splice(${i},1);renderMergeFiles()">✕</span>
+        </div>
+      `).join('');
+    }
+
+    // SPLIT
+    async function doSplit() {
+      const input = document.getElementById('split-input').value;
+      const rangesStr = document.getElementById('split-ranges').value;
+      const output = document.getElementById('split-output').value;
+      if (!input || !rangesStr || !output) return showResult('split-result', 'Fill all fields', true);
+      const ranges = rangesStr.split(';').map(r => r.trim()).filter(Boolean);
+      setStatus('Splitting...');
+      try {
+        const result = await invoke('split_pdf', { path: input, ranges, outputDir: output });
+        showResult('split-result', 'Created: ' + result.join('\n'), false);
+        setStatus('Split complete');
+      } catch (e) { showResult('split-result', e, true); setStatus('Error'); }
+    }
+
+    // Thumbnails
+    async function loadThumbnails(section) {
+      const input = document.getElementById(section + '-input').value;
+      if (!input) return;
+      try {
+        const thumbs = await invoke('get_page_thumbnails', { path: input });
+        const el = document.getElementById(section + '-thumbnails');
+        el.innerHTML = thumbs.map(t => `
+          <div class="thumb" onclick="this.classList.toggle('selected')">
+            <div class="page-preview">${t.page}</div>
+            <div class="page-num">Page ${t.page} (${Math.round(t.width)}×${Math.round(t.height)})</div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    // COMPRESS
+    async function doCompress() {
+      const input = document.getElementById('compress-input').value;
+      const output = document.getElementById('compress-output').value;
+      if (!input || !output) return showResult('compress-result', 'Fill all fields', true);
+      setStatus('Compressing...');
+      try {
+        const result = await invoke('compress_pdf', { path: input, output });
+        showResult('compress-result', result, false);
+        setStatus('Compression complete');
+      } catch (e) { showResult('compress-result', e, true); setStatus('Error'); }
+    }
+
+    // CONVERT
+    async function doConvert() {
+      const mode = document.getElementById('convert-mode').value;
+      const input = document.getElementById('convert-input').value;
+      const output = document.getElementById('convert-output').value;
+      if (!input || !output) return showResult('convert-result', 'Fill all fields', true);
+      setStatus('Converting...');
+      try {
+        let result;
+        if (mode === 'pdf2img') {
+          result = await invoke('pdf_to_images', { path: input, outputDir: output });
+          showResult('convert-result', 'Created: ' + result.join('\n'), false);
+        } else {
+          const paths = input.split('\n').map(p => p.trim()).filter(Boolean);
+          result = await invoke('images_to_pdf', { imagePaths: paths, output });
+          showResult('convert-result', result, false);
+        }
+        setStatus('Conversion complete');
+      } catch (e) { showResult('convert-result', e, true); setStatus('Error'); }
+    }
+
+    // ROTATE
+    async function doRotate() {
+      const input = document.getElementById('rotate-input').value;
+      const pagesStr = document.getElementById('rotate-pages').value;
+      const degrees = parseInt(document.getElementById('rotate-degrees').value);
+      const output = document.getElementById('rotate-output').value;
+      if (!input || !pagesStr || !output) return showResult('rotate-result', 'Fill all fields', true);
+      const pages = pagesStr.split(',').map(p => parseInt(p.trim())).filter(n => !isNaN(n));
+      setStatus('Rotating...');
+      try {
+        const result = await invoke('rotate_pdf', { path: input, pages, degrees, output });
+        showResult('rotate-result', result, false);
+        setStatus('Rotation complete');
+      } catch (e) { showResult('rotate-result', e, true); setStatus('Error'); }
+    }
+
+    // TEXT
+    async function doExtractText() {
+      const input = document.getElementById('text-input').value;
+      const pagesStr = document.getElementById('text-pages').value;
+      if (!input) return showResult('text-result', 'Set input PDF', true);
+      const pages = pagesStr ? pagesStr.split(',').map(p => parseInt(p.trim())).filter(n => !isNaN(n)) : null;
+      setStatus('Extracting...');
+      try {
+        const result = await invoke('extract_text', { path: input, pages });
+        document.getElementById('text-output').value = result;
+        showResult('text-result', 'Text extracted successfully', false);
+        setStatus('Extraction complete');
+      } catch (e) { showResult('text-result', e, true); setStatus('Error'); }
+    }
+
+    // WATERMARK
+    async function doWatermark() {
+      const input = document.getElementById('watermark-input').value;
+      const text = document.getElementById('watermark-text').value;
+      const output = document.getElementById('watermark-output').value;
+      if (!input || !text || !output) return showResult('watermark-result', 'Fill all fields', true);
+      setStatus('Adding watermark...');
+      try {
+        const result = await invoke('add_watermark', { path: input, watermarkText: text, output });
+        showResult('watermark-result', result, false);
+        setStatus('Watermark added');
+      } catch (e) { showResult('watermark-result', e, true); setStatus('Error'); }
+    }
+
+    // SECURITY
+    async function doSecurity() {
+      const mode = document.getElementById('security-mode').value;
+      const input = document.getElementById('security-input').value;
+      const password = document.getElementById('security-password').value;
+      const output = document.getElementById('security-output').value;
+      if (!input || !password || !output) return showResult('security-result', 'Fill all fields', true);
+      setStatus('Processing...');
+      try {
+        let result;
+        if (mode === 'protect') {
+          result = await invoke('protect_pdf', { path: input, password, output });
+        } else {
+          result = await invoke('remove_protection', { path: input, password, output });
+        }
+        showResult('security-result', result, false);
+        setStatus('Done');
+      } catch (e) { showResult('security-result', e, true); setStatus('Error'); }
+    }
+  </script>
+</body>
+</html>

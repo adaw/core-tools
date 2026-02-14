@@ -1,0 +1,13 @@
+{
+  "name": "pdf-tools",
+  "version": "1.0.0",
+  "description": "CORE Tool #7: PDF Tools — Tauri 2 desktop app",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}
