@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicedoc/tauri-schema-gen/refs/heads/master/tauri.conf.json",
+  "productName": "Clipboard Manager",
+  "version": "1.0.0",
+  "identifier": "ai.goden.core.clipboard-manager",
+  "build": {
+    "frontendDist": "../ui",
+    "devUrl": "http://localhost:1420"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Clipboard Manager",
+        "width": 800,
+        "height": 700,
+        "resizable": true,
+        "decorations": true,
+        "transparent": false
+      }
+    ]
+  },
+  "plugins": {
+    "opener": {
+      "openUrl": {
+        "urls": ["https://*"]
+      }
+    }
+  }
+}

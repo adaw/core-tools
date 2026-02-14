@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipboard Manager</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>📋 Clipboard Manager</h1>
+      <div class="stats" id="stats"></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search clipboard history..." autocomplete="off" />
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" data-category="all">All</button>
+        <button class="filter-btn" data-category="text">Text</button>
+        <button class="filter-btn" data-category="link">Links</button>
+        <button class="filter-btn" data-category="code">Code</button>
+        <button class="filter-btn" data-category="image">Images</button>
+        <button class="filter-btn" data-category="pinned">📌 Pinned</button>
+      </div>
+      <div class="actions">
+        <button class="action-btn" id="exportJson" title="Export JSON">📥 JSON</button>
+        <button class="action-btn" id="exportTxt" title="Export TXT">📄 TXT</button>
+        <button class="action-btn danger" id="clearAll" title="Clear unpinned">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <div class="entries" id="entries">
+      <div class="empty-state">
+        <p>📋 No clipboard entries yet</p>
+        <p class="sub">Copy something to get started!</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

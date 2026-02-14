@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch File Renamer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <h1><span class="icon">⚡</span> Batch File Renamer</h1>
+      <div class="header-actions">
+        <button id="undoBtn" class="btn btn-ghost" disabled>
+          ↩ Undo <span id="undoCount" class="badge">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Directory picker -->
+    <section class="section">
+      <div class="input-row">
+        <input type="text" id="dirInput" placeholder="Enter directory path…" class="input-main" />
+        <button id="loadBtn" class="btn btn-primary">Load Files</button>
+      </div>
+      <div id="fileCount" class="file-count"></div>
+    </section>
+
+    <!-- Rename mode -->
+    <section class="section">
+      <div class="mode-tabs">
+        <button class="tab active" data-mode="find_replace">Find & Replace</button>
+        <button class="tab" data-mode="numbering">Numbering</button>
+        <button class="tab" data-mode="date">Date</button>
+        <button class="tab" data-mode="extension">Extension</button>
+        <button class="tab" data-mode="case">Case</button>
+        <button class="tab" data-mode="regex">Regex</button>
+      </div>
+
+      <!-- Mode panels -->
+      <div class="mode-panels">
+        <div class="panel active" data-panel="find_replace">
+          <input type="text" id="findText" placeholder="Find…" class="input" />
+          <input type="text" id="replaceText" placeholder="Replace with…" class="input" />
+        </div>
+        <div class="panel" data-panel="numbering">
+          <input type="text" id="numPrefix" placeholder="Prefix" value="file_" class="input" />
+          <input type="number" id="numStart" placeholder="Start" value="1" class="input input-sm" />
+          <input type="number" id="numPadding" placeholder="Padding" value="3" class="input input-sm" />
+        </div>
+        <div class="panel" data-panel="date">
+          <input type="text" id="dateFormat" placeholder="Format" value="%Y-%m-%d" class="input" />
+          <select id="datePosition" class="input">
+            <option value="prefix">Prefix</option>
+            <option value="suffix">Suffix</option>
+          </select>
+        </div>
+        <div class="panel" data-panel="extension">
+          <input type="text" id="newExt" placeholder="New extension (e.g. png)" class="input" />
+        </div>
+        <div class="panel" data-panel="case">
+          <select id="caseType" class="input">
+            <option value="lower">lowercase</option>
+            <option value="upper">UPPERCASE</option>
+            <option value="title">Title Case</option>
+            <option value="snake">snake_case</option>
+            <option value="kebab">kebab-case</option>
+          </select>
+        </div>
+        <div class="panel" data-panel="regex">
+          <input type="text" id="regexPattern" placeholder="Pattern (regex)" class="input" />
+          <input type="text" id="regexReplace" placeholder="Replacement ($1, $2…)" class="input" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button id="previewBtn" class="btn btn-secondary" disabled>Preview</button>
+      <button id="renameBtn" class="btn btn-primary" disabled>Rename Files</button>
+    </div>
+
+    <!-- Progress -->
+    <div id="progressBar" class="progress-bar hidden">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+
+    <!-- Preview table -->
+    <section id="previewSection" class="section hidden">
+      <h2>Preview</h2>
+      <div class="table-wrap">
+        <table id="previewTable">
+          <thead><tr><th>Original</th><th>→</th><th>New Name</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Status -->
+    <div id="status" class="status hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

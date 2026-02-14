@@ -1,0 +1,11 @@
+{
+  "name": "clipboard-manager-tauri",
+  "version": "1.0.0",
+  "description": "CORE Tool #2: Clipboard Manager — Tauri 2 app with clipboard history, search, categories, and export",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}
