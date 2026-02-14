@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCR & PDF Converter</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>⚡ OCR & PDF Converter</h1>
+      <p class="subtitle">Extract text • Convert documents • Batch process</p>
+    </header>
+
+    <div class="toolbar">
+      <button id="btn-ocr" class="tool-btn active" onclick="switchMode('ocr')">🔍 OCR Image</button>
+      <button id="btn-pdf" class="tool-btn" onclick="switchMode('pdf')">📄 PDF → Text</button>
+      <button id="btn-img2pdf" class="tool-btn" onclick="switchMode('img2pdf')">🖼️ Image → PDF</button>
+      <button id="btn-batch" class="tool-btn" onclick="switchMode('batch')">📦 Batch OCR</button>
+
+      <div class="toolbar-right">
+        <label for="lang-select">Language:</label>
+        <select id="lang-select">
+          <option value="eng">English</option>
+          <option value="ces">Čeština</option>
+          <option value="deu">Deutsch</option>
+          <option value="fra">Français</option>
+          <option value="spa">Español</option>
+          <option value="ita">Italiano</option>
+          <option value="pol">Polski</option>
+          <option value="rus">Русский</option>
+          <option value="chi_sim">中文</option>
+          <option value="jpn">日本語</option>
+          <option value="kor">한국어</option>
+          <option value="ara">العربية</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Left: Input / Preview -->
+      <div class="panel panel-left">
+        <div class="panel-header">
+          <h2>📁 Input</h2>
+          <button id="btn-open" class="accent-btn" onclick="openFile()">Open File</button>
+        </div>
+        <div id="preview-area" class="preview-area">
+          <div class="drop-zone" id="drop-zone">
+            <span class="drop-icon">📂</span>
+            <p>Drop file here or click <strong>Open File</strong></p>
+            <p class="hint">Supports: PNG, JPG, TIFF, BMP, PDF</p>
+          </div>
+        </div>
+        <div id="file-info" class="file-info hidden">
+          <span id="file-name"></span>
+          <span id="file-size"></span>
+        </div>
+      </div>
+
+      <!-- Right: Output -->
+      <div class="panel panel-right">
+        <div class="panel-header">
+          <h2>📝 Output</h2>
+          <div class="panel-actions">
+            <span id="confidence-badge" class="badge hidden">Confidence: --</span>
+            <button class="accent-btn" onclick="copyOutput()">📋 Copy</button>
+            <button class="accent-btn" onclick="saveOutput()">💾 Save</button>
+          </div>
+        </div>
+        <div id="output-area" class="output-area">
+          <textarea id="output-text" placeholder="Extracted text will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <span id="status-text">Ready</span>
+      <div id="progress-container" class="hidden">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
