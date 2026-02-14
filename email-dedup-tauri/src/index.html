@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Transfer & Dedup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --bg3: #0f3460;
+      --accent: #00ff88;
+      --accent2: #00cc6a;
+      --text: #e0e0e0;
+      --text2: #a0a0b0;
+      --danger: #ff4757;
+      --warn: #ffa502;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--bg2);
+      padding: 16px 24px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 22px; color: var(--accent); }
+    header .subtitle { color: var(--text2); font-size: 13px; }
+
+    .tabs {
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid #333;
+    }
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      color: var(--text2);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+    .panel {
+      background: var(--bg2);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .panel h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .form-row label {
+      min-width: 80px;
+      color: var(--text2);
+      font-size: 13px;
+    }
+
+    input, select {
+      background: var(--bg);
+      border: 1px solid #444;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      flex: 1;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--accent2); }
+    button.danger { background: var(--danger); color: #fff; }
+    button.danger:hover { background: #e03e4a; }
+    button.secondary { background: var(--bg3); color: var(--text); }
+    button.secondary:hover { background: #1a4a80; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge.ok { background: #00ff8833; color: var(--accent); }
+    .badge.err { background: #ff475733; color: var(--danger); }
+
+    .dup-group {
+      background: var(--bg);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .dup-group .key {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--warn);
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .dup-group .email-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid #222;
+    }
+    .dup-group .email-row:last-child { border: none; }
+    .dup-group .email-row .keep { color: var(--accent); }
+    .dup-group .email-row .dupe { color: var(--danger); opacity: 0.7; }
+
+    .progress-bar {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+
+    .stats {
+      display: flex;
+      gap: 24px;
+      margin: 16px 0;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat .num {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat .label {
+      font-size: 12px;
+      color: var(--text2);
+      text-transform: uppercase;
+    }
+
+    .log {
+      background: #0d0d1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      color: var(--text2);
+    }
+    .log .entry { padding: 2px 0; }
+    .log .entry.error { color: var(--danger); }
+    .log .entry.success { color: var(--accent); }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>📧 Email Transfer & Dedup</h1>
+      <div class="subtitle">CORE Tool #6 — IMAP connect, transfer, deduplicate, backup</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="dedup">🔍 Dedup</div>
+    <div class="tab" data-tab="transfer">🔄 Transfer</div>
+    <div class="tab" data-tab="backup">💾 Backup</div>
+  </div>
+
+  <div class="content">
+    <!-- ── DEDUP TAB ────────────────────────────────── -->
+    <div id="tab-dedup">
+      <div class="panel">
+        <h3>📬 IMAP Account</h3>
+        <div class="form-row">
+          <label>Provider</label>
+          <select id="dedup-provider" onchange="onProviderChange('dedup')">
+            <option value="gmail">Gmail</option>
+            <option value="outlook">Outlook</option>
+            <option value="icloud">iCloud</option>
+            <option value="generic">Generic IMAP</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Host</label>
+          <input id="dedup-host" value="imap.gmail.com" />
+          <label style="min-width:40px">Port</label>
+          <input id="dedup-port" value="993" style="max-width:80px" />
+        </div>
+        <div class="form-row">
+          <label>Username</label>
+          <input id="dedup-user" placeholder="email@example.com" />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="dedup-pass" type="password" placeholder="App password" />
+        </div>
+        <div class="form-row">
+          <button onclick="connectAccount('dedup')">Connect</button>
+          <span id="dedup-status"></span>
+        </div>
+      </div>
+
+      <div class="panel" id="dedup-options-panel" style="display:none">
+        <h3>⚙️ Dedup Settings</h3>
+        <div class="form-row">
+          <label>Mailbox</label>
+          <select id="dedup-mailbox"></select>
+        </div>
+        <div class="form-row">
+          <label>Method</label>
+          <select id="dedup-method">
+            <option value="message-id">Message-ID (exact)</option>
+            <option value="subject-date">Subject + Date Hash</option>
+            <option value="size-subject">Size + Subject</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <button onclick="scanDuplicates()">🔍 Scan for Duplicates</button>
+          <label><input type="checkbox" id="dedup-dry" checked /> Dry Run</label>
+        </div>
+      </div>
+
+      <div class="panel" id="dedup-results" style="display:none">
+        <h3>📊 Results</h3>
+        <div class="stats" id="dedup-stats"></div>
+        <div id="dedup-groups"></div>
+        <div style="margin-top:16px">
+          <button class="danger" id="btn-delete-dupes" onclick="deleteDuplicates()">🗑️ Delete Duplicates</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRANSFER TAB ─────────────────────────────── -->
+    <div id="tab-transfer" class="hidden">
+      <div class="accounts-grid">
+        <div class="panel">
+          <h3>📤 Source Account</h3>
+          <div class="form-row">
+            <label>Provider</label>
+            <select id="src-provider" onchange="onProviderChange('src')">
+              <option value="gmail">Gmail</option>
+              <option value="outlook">Outlook</option>
+              <option value="icloud">iCloud</option>
+              <option value="generic">Generic</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Host</label>
+            <input id="src-host" value="imap.gmail.com" />
+            <label style="min-width:40px">Port</label>
+            <input id="src-port" value="993" style="max-width:80px" />
+          </div>
+          <div class="form-row">
+            <label>User</label>
+            <input id="src-user" placeholder="email@example.com" />
+          </div>
+          <div class="form-row">
+            <label>Pass</label>
+            <input id="src-pass" type="password" />
+          </div>
+          <div class="form-row">
+            <button onclick="connectAccount('src')">Connect</button>
+            <span id="src-status"></span>
+          </div>
+          <div class="form-row">
+            <label>Mailbox</label>
+            <select id="src-mailbox"></select>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>📥 Destination Account</h3>
+          <div class="form-row">
+            <label>Provider</label>
+            <select id="dst-provider" onchange="onProviderChange('dst')">
+              <option value="gmail">Gmail</option>
+              <option value="outlook">Outlook</option>
+              <option value="icloud">iCloud</option>
+              <option value="generic">Generic</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Host</label>
+            <input id="dst-host" value="imap.gmail.com" />
+            <label style="min-width:40px">Port</label>
+            <input id="dst-port" value="993" style="max-width:80px" />
+          </div>
+          <div class="form-row">
+            <label>User</label>
+            <input id="dst-user" placeholder="email@example.com" />
+          </div>
+          <div class="form-row">
+            <label>Pass</label>
+            <input id="dst-pass" type="password" />
+          </div>
+          <div class="form-row">
+            <button onclick="connectAccount('dst')">Connect</button>
+            <span id="dst-status"></span>
+          </div>
+          <div class="form-row">
+            <label>Mailbox</label>
+            <select id="dst-mailbox"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <button onclick="startTransfer()">🔄 Start Transfer</button>
+        <div class="progress-bar" id="transfer-progress" style="display:none">
+          <div class="fill" style="width:0%"></div>
+        </div>
+        <div class="log" id="transfer-log" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ── BACKUP TAB ───────────────────────────────── -->
+    <div id="tab-backup" class="hidden">
+      <div class="panel">
+        <h3>💾 Backup to .mbox</h3>
+        <div class="form-row">
+          <label>Provider</label>
+          <select id="bak-provider" onchange="onProviderChange('bak')">
+            <option value="gmail">Gmail</option>
+            <option value="outlook">Outlook</option>
+            <option value="icloud">iCloud</option>
+            <option value="generic">Generic</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Host</label>
+          <input id="bak-host" value="imap.gmail.com" />
+          <label style="min-width:40px">Port</label>
+          <input id="bak-port" value="993" style="max-width:80px" />
+        </div>
+        <div class="form-row">
+          <label>User</label>
+          <input id="bak-user" placeholder="email@example.com" />
+        </div>
+        <div class="form-row">
+          <label>Pass</label>
+          <input id="bak-pass" type="password" />
+        </div>
+        <div class="form-row">
+          <button onclick="connectAccount('bak')">Connect</button>
+          <span id="bak-status"></span>
+        </div>
+        <div class="form-row">
+          <label>Mailbox</label>
+          <select id="bak-mailbox"></select>
+        </div>
+        <div class="form-row">
+          <label>Output</label>
+          <input id="bak-output" value="~/Desktop/email-backup.mbox" />
+        </div>
+        <div class="form-row">
+          <button onclick="startBackup()">💾 Export .mbox</button>
+        </div>
+        <div class="log" id="backup-log" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { invoke } = window.__TAURI__.core;
+
+    // ── Tab switching ──────────────────────────────────
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('[id^="tab-"]').forEach(p => p.classList.add('hidden'));
+        document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
+      });
+    });
+
+    // ── Provider defaults ──────────────────────────────
+    const PROVIDERS = {
+      gmail:   { host: 'imap.gmail.com', port: 993 },
+      outlook: { host: 'outlook.office365.com', port: 993 },
+      icloud:  { host: 'imap.mail.me.com', port: 993 },
+      generic: { host: '', port: 993 },
+    };
+
+    function onProviderChange(prefix) {
+      const provider = document.getElementById(prefix + '-provider').value;
+      const defaults = PROVIDERS[provider];
+      document.getElementById(prefix + '-host').value = defaults.host;
+      document.getElementById(prefix + '-port').value = defaults.port;
+    }
+
+    // ── Get account from form ──────────────────────────
+    function getAccount(prefix) {
+      return {
+        label: prefix,
+        host: document.getElementById(prefix + '-host').value,
+        port: parseInt(document.getElementById(prefix + '-port').value),
+        username: document.getElementById(prefix + '-user').value,
+        password: document.getElementById(prefix + '-pass').value,
+        provider: document.getElementById(prefix + '-provider').value,
+      };
+    }
+
+    // ── Connect ────────────────────────────────────────
+    let mailboxData = {};
+    let currentDupGroups = [];
+
+    async function connectAccount(prefix) {
+      const status = document.getElementById(prefix + '-status');
+      status.innerHTML = '<span style="color:#ffa502">Connecting...</span>';
+      try {
+        const account = getAccount(prefix);
+        const mailboxes = await invoke('test_connection', { account });
+        mailboxData[prefix] = mailboxes;
+        status.innerHTML = '<span class="badge ok">✓ Connected (' + mailboxes.length + ' mailboxes)</span>';
+
+        // Populate mailbox dropdown
+        const select = document.getElementById(prefix + '-mailbox');
+        if (select) {
+          select.innerHTML = '';
+          mailboxes.forEach(mb => {
+            const opt = document.createElement('option');
+            opt.value = mb.name;
+            opt.textContent = mb.name + ' (' + mb.message_count + ')';
+            select.appendChild(opt);
+          });
+        }
+
+        // Show dedup options
+        if (prefix === 'dedup') {
+          document.getElementById('dedup-options-panel').style.display = '';
+        }
+      } catch (e) {
+        status.innerHTML = '<span class="badge err">✗ ' + e + '</span>';
+      }
+    }
+
+    // ── Scan Duplicates ────────────────────────────────
+    async function scanDuplicates() {
+      const account = getAccount('dedup');
+      const mailbox = document.getElementById('dedup-mailbox').value;
+      const method = document.getElementById('dedup-method').value;
+
+      try {
+        const result = await invoke('find_duplicates', { account, mailbox, method });
+        currentDupGroups = result.duplicate_groups;
+
+        // Stats
+        document.getElementById('dedup-stats').innerHTML = `
+          <div class="stat"><div class="num">${result.total_scanned}</div><div class="label">Scanned</div></div>
+          <div class="stat"><div class="num">${result.duplicate_groups.length}</div><div class="label">Groups</div></div>
+          <div class="stat"><div class="num" style="color:var(--danger)">${result.total_duplicates}</div><div class="label">Duplicates</div></div>
+        `;
+
+        // Groups preview
+        const container = document.getElementById('dedup-groups');
+        container.innerHTML = '';
+        result.duplicate_groups.slice(0, 20).forEach(group => {
+          const div = document.createElement('div');
+          div.className = 'dup-group';
+          let rows = group.emails.map((e, i) =>
+            `<div class="email-row">
+              <span class="${i === 0 ? 'keep' : 'dupe'}">${i === 0 ? '✓ KEEP' : '✗ DUPE'}</span>
+              <span>${e.subject || '(no subject)'}</span>
+              <span>${e.from}</span>
+              <span>${e.date}</span>
+            </div>`
+          ).join('');
+          div.innerHTML = `<div class="key">${group.method}: ${group.key.substring(0, 60)}...</div>${rows}`;
+          container.appendChild(div);
+        });
+
+        document.getElementById('dedup-results').style.display = '';
+      } catch (e) {
+        alert('Error: ' + e);
+      }
+    }
+
+    // ── Delete Duplicates ──────────────────────────────
+    async function deleteDuplicates() {
+      const dryRun = document.getElementById('dedup-dry').checked;
+      if (!dryRun && !confirm('DELETE duplicates permanently? This cannot be undone!')) return;
+
+      const account = getAccount('dedup');
+      const mailbox = document.getElementById('dedup-mailbox').value;
+
+      try {
+        const count = await invoke('delete_duplicates', {
+          account, mailbox, groups: currentDupGroups, dryRun
+        });
+        alert(dryRun ? `Dry run: ${count} duplicates would be deleted` : `Deleted ${count} duplicates`);
+      } catch (e) {
+        alert('Error: ' + e);
+      }
+    }
+
+    // ── Transfer ───────────────────────────────────────
+    async function startTransfer() {
+      const srcAccount = getAccount('src');
+      const dstAccount = getAccount('dst');
+      const srcMailbox = document.getElementById('src-mailbox').value;
+      const dstMailbox = document.getElementById('dst-mailbox').value;
+
+      const log = document.getElementById('transfer-log');
+      log.style.display = '';
+      log.innerHTML = '<div class="entry">Starting transfer...</div>';
+
+      try {
+        const result = await invoke('transfer_emails', {
+          srcAccount, dstAccount, srcMailbox, dstMailbox
+        });
+        log.innerHTML += `<div class="entry success">✓ Transferred: ${result.transferred}</div>`;
+        if (result.failed > 0) {
+          log.innerHTML += `<div class="entry error">✗ Failed: ${result.failed}</div>`;
+          result.errors.forEach(e => {
+            log.innerHTML += `<div class="entry error">&nbsp;&nbsp;${e}</div>`;
+          });
+        }
+      } catch (e) {
+        log.innerHTML += `<div class="entry error">Error: ${e}</div>`;
+      }
+    }
+
+    // ── Backup ─────────────────────────────────────────
+    async function startBackup() {
+      const account = getAccount('bak');
+      const mailbox = document.getElementById('bak-mailbox').value;
+      const outputPath = document.getElementById('bak-output').value;
+
+      const log = document.getElementById('backup-log');
+      log.style.display = '';
+      log.innerHTML = '<div class="entry">Exporting to .mbox...</div>';
+
+      try {
+        const count = await invoke('backup_mbox', { account, mailbox, outputPath });
+        log.innerHTML += `<div class="entry success">✓ Exported ${count} emails to ${outputPath}</div>`;
+      } catch (e) {
+        log.innerHTML += `<div class="entry error">Error: ${e}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
