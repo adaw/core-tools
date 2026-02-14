@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Info — CORE Tool #8</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #1a1a2e; --bg2: #16213e; --bg3: #0f3460; --accent: #00ff88; --text: #e0e0e0; --dim: #888; --red: #ff4757; --yellow: #ffa502; --blue: #3498db; }
+body { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+header { background: var(--bg2); padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #333; }
+header h1 { color: var(--accent); font-size: 18px; font-weight: 600; }
+header .refresh-info { color: var(--dim); font-size: 12px; margin-left: auto; }
+.tabs { display: flex; background: var(--bg2); border-bottom: 2px solid #333; padding: 0 16px; }
+.tab { padding: 10px 20px; cursor: pointer; color: var(--dim); border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 13px; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+main { flex: 1; overflow-y: auto; padding: 20px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--bg2); border-radius: 8px; padding: 16px; border: 1px solid #333; }
+.card h3 { color: var(--accent); font-size: 14px; margin-bottom: 12px; }
+.stat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #222; font-size: 13px; }
+.stat-value { color: var(--accent); font-weight: 600; }
+.bar-container { background: #333; border-radius: 4px; height: 24px; margin: 8px 0; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.bar-fill.green { background: linear-gradient(90deg, #00ff88, #00cc6a); }
+.bar-fill.yellow { background: linear-gradient(90deg, #ffa502, #ff7f00); }
+.bar-fill.red { background: linear-gradient(90deg, #ff4757, #cc0000); }
+.bar-label { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #fff; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 12px; background: var(--bg3); color: var(--accent); }
+td { padding: 8px 12px; border-bottom: 1px solid #222; }
+tr:hover { background: rgba(0,255,136,0.05); }
+.cpu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.core-box { background: var(--bg); border: 1px solid #333; border-radius: 6px; padding: 10px; text-align: center; }
+.core-box .label { font-size: 11px; color: var(--dim); }
+.core-box .value { font-size: 20px; color: var(--accent); font-weight: 700; }
+canvas { width: 100%; height: 120px; }
+.export-btns { display: flex; gap: 8px; margin-top: 16px; }
+.btn { background: var(--bg3); color: var(--accent); border: 1px solid var(--accent); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.btn:hover { background: var(--accent); color: var(--bg); }
+.net-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+.rx { background: rgba(0,255,136,0.15); color: var(--accent); }
+.tx { background: rgba(52,152,219,0.15); color: var(--blue); }
+svg.chart { width: 100%; height: 100px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🖥 System Info</h1>
+  <span style="color:var(--dim);font-size:12px;">CORE Tool #8</span>
+  <span class="refresh-info" id="refresh-info">Refreshing...</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="overview">📊 Overview</div>
+  <div class="tab" data-tab="cpu">⚡ CPU</div>
+  <div class="tab" data-tab="memory">🧠 Memory</div>
+  <div class="tab" data-tab="disks">💾 Disks</div>
+  <div class="tab" data-tab="network">🌐 Network</div>
+  <div class="tab" data-tab="processes">📋 Processes</div>
+</div>
+
+<main>
+  <!-- Overview -->
+  <div class="panel active" id="panel-overview">
+    <div class="grid">
+      <div class="card">
+        <h3>🖥 System</h3>
+        <div id="overview-system"></div>
+      </div>
+      <div class="card">
+        <h3>⚡ CPU</h3>
+        <div id="overview-cpu"></div>
+        <div class="bar-container"><div class="bar-fill green" id="overview-cpu-bar"></div><span class="bar-label" id="overview-cpu-label"></span></div>
+        <svg class="chart" id="cpu-sparkline"></svg>
+      </div>
+      <div class="card">
+        <h3>🧠 Memory</h3>
+        <div id="overview-mem"></div>
+        <div class="bar-container"><div class="bar-fill green" id="overview-mem-bar"></div><span class="bar-label" id="overview-mem-label"></span></div>
+        <svg class="chart" id="mem-sparkline"></svg>
+      </div>
+      <div class="card">
+        <h3>💾 Disk Usage</h3>
+        <div id="overview-disk"></div>
+      </div>
+    </div>
+    <div class="export-btns">
+      <button class="btn" onclick="exportJSON()">📄 Export JSON</button>
+      <button class="btn" onclick="exportHTML()">🌐 Export HTML</button>
+    </div>
+  </div>
+
+  <!-- CPU -->
+  <div class="panel" id="panel-cpu">
+    <div class="card" style="margin-bottom:16px">
+      <h3>CPU Details</h3>
+      <div id="cpu-details"></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <h3>Per-Core Usage</h3>
+      <div class="cpu-grid" id="cpu-cores"></div>
+    </div>
+    <div class="card">
+      <h3>🌡 Temperatures</h3>
+      <div id="cpu-temps"></div>
+    </div>
+  </div>
+
+  <!-- Memory -->
+  <div class="panel" id="panel-memory">
+    <div class="grid">
+      <div class="card">
+        <h3>RAM</h3>
+        <div id="mem-details"></div>
+        <div class="bar-container"><div class="bar-fill green" id="mem-bar"></div><span class="bar-label" id="mem-label"></span></div>
+      </div>
+      <div class="card">
+        <h3>Swap</h3>
+        <div id="swap-details"></div>
+        <div class="bar-container"><div class="bar-fill yellow" id="swap-bar"></div><span class="bar-label" id="swap-label"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disks -->
+  <div class="panel" id="panel-disks">
+    <div class="card">
+      <table>
+        <thead><tr><th>Name</th><th>Mount</th><th>FS</th><th>Total</th><th>Used</th><th>Free</th><th>Usage</th></tr></thead>
+        <tbody id="disk-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Network -->
+  <div class="panel" id="panel-network">
+    <div class="card">
+      <table>
+        <thead><tr><th>Interface</th><th>↓ Received</th><th>↑ Transmitted</th><th>Packets RX</th><th>Packets TX</th></tr></thead>
+        <tbody id="net-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Processes -->
+  <div class="panel" id="panel-processes">
+    <div class="card">
+      <table>
+        <thead><tr><th>PID</th><th>Name</th><th>CPU %</th><th>Memory</th><th>Status</th></tr></thead>
+        <tbody id="proc-table"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const { invoke } = window.__TAURI__.core;
+
+// ── Tab switching ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Sparkline history ──
+const cpuHistory = [];
+const memHistory = [];
+const MAX_POINTS = 60;
+
+function barColor(pct) {
+  if (pct > 85) return 'red';
+  if (pct > 60) return 'yellow';
+  return 'green';
+}
+
+function formatBytes(bytes) {
+  if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
+  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+  if (bytes >= 1024) return (bytes / 1024).toFixed(0) + ' KB';
+  return bytes + ' B';
+}
+
+function formatUptime(seconds) {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return (d > 0 ? d + 'd ' : '') + h + 'h ' + m + 'm';
+}
+
+function renderSparkline(svgId, data, color) {
+  const svg = document.getElementById(svgId);
+  if (!svg || data.length < 2) return;
+  const w = svg.clientWidth || 300;
+  const h = svg.clientHeight || 100;
+  const step = w / (MAX_POINTS - 1);
+  const points = data.map((v, i) => `${i * step},${h - (v / 100) * h}`).join(' ');
+  const fillPoints = points + ` ${(data.length - 1) * step},${h} 0,${h}`;
+  svg.innerHTML = `
+    <defs><linearGradient id="g-${svgId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0.02"/>
+    </linearGradient></defs>
+    <polygon points="${fillPoints}" fill="url(#g-${svgId})"/>
+    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2"/>
+  `;
+}
+
+// ── Refresh functions ──
+
+async function refreshOverview() {
+  try {
+    const o = await invoke('get_overview');
+    document.getElementById('overview-system').innerHTML = `
+      <div class="stat"><span>Hostname</span><span class="stat-value">${o.hostname}</span></div>
+      <div class="stat"><span>OS</span><span class="stat-value">${o.os_name} ${o.os_version}</span></div>
+      <div class="stat"><span>Kernel</span><span class="stat-value">${o.kernel_version}</span></div>
+      <div class="stat"><span>Uptime</span><span class="stat-value">${formatUptime(o.uptime_seconds)}</span></div>
+      <div class="stat"><span>Load Avg</span><span class="stat-value">${o.load_avg.map(v => v.toFixed(2)).join(' / ')}</span></div>
+    `;
+    const cpuPct = o.cpu_usage_percent.toFixed(1);
+    document.getElementById('overview-cpu').innerHTML = `
+      <div class="stat"><span>${o.cpu_brand}</span><span class="stat-value">${o.cpu_cores} cores</span></div>
+    `;
+    document.getElementById('overview-cpu-bar').style.width = cpuPct + '%';
+    document.getElementById('overview-cpu-bar').className = 'bar-fill ' + barColor(o.cpu_usage_percent);
+    document.getElementById('overview-cpu-label').textContent = cpuPct + '%';
+
+    const memPct = o.total_memory_mb > 0 ? ((o.used_memory_mb / o.total_memory_mb) * 100) : 0;
+    document.getElementById('overview-mem').innerHTML = `
+      <div class="stat"><span>Used / Total</span><span class="stat-value">${(o.used_memory_mb/1024).toFixed(1)} / ${(o.total_memory_mb/1024).toFixed(1)} GB</span></div>
+    `;
+    document.getElementById('overview-mem-bar').style.width = memPct.toFixed(1) + '%';
+    document.getElementById('overview-mem-bar').className = 'bar-fill ' + barColor(memPct);
+    document.getElementById('overview-mem-label').textContent = memPct.toFixed(1) + '%';
+
+    cpuHistory.push(o.cpu_usage_percent);
+    memHistory.push(memPct);
+    if (cpuHistory.length > MAX_POINTS) cpuHistory.shift();
+    if (memHistory.length > MAX_POINTS) memHistory.shift();
+    renderSparkline('cpu-sparkline', cpuHistory, '#00ff88');
+    renderSparkline('mem-sparkline', memHistory, '#3498db');
+
+    document.getElementById('refresh-info').textContent = 'Last: ' + new Date().toLocaleTimeString();
+  } catch (e) { console.error('overview:', e); }
+}
+
+async function refreshCPU() {
+  try {
+    const c = await invoke('get_cpu_info');
+    document.getElementById('cpu-details').innerHTML = `
+      <div class="stat"><span>Brand</span><span class="stat-value">${c.brand}</span></div>
+      <div class="stat"><span>Physical / Logical</span><span class="stat-value">${c.physical_cores} / ${c.logical_cores}</span></div>
+      <div class="stat"><span>Global Usage</span><span class="stat-value">${c.global_usage.toFixed(1)}%</span></div>
+    `;
+    document.getElementById('cpu-cores').innerHTML = c.cores.map(core => `
+      <div class="core-box">
+        <div class="label">${core.name}</div>
+        <div class="value">${core.usage_percent.toFixed(0)}%</div>
+        <div class="label">${core.frequency_mhz} MHz</div>
+      </div>
+    `).join('');
+    document.getElementById('cpu-temps').innerHTML = c.temperatures.length > 0
+      ? c.temperatures.map(t => `<div class="stat"><span>${t.label}</span><span class="stat-value">${t.temperature_c.toFixed(1)}°C (max ${t.max_c.toFixed(1)}°C)</span></div>`).join('')
+      : '<div class="stat"><span>No temperature sensors available</span></div>';
+  } catch (e) { console.error('cpu:', e); }
+}
+
+async function refreshMemory() {
+  try {
+    const m = await invoke('get_memory_info');
+    document.getElementById('mem-details').innerHTML = `
+      <div class="stat"><span>Total</span><span class="stat-value">${(m.total_mb/1024).toFixed(1)} GB</span></div>
+      <div class="stat"><span>Used</span><span class="stat-value">${(m.used_mb/1024).toFixed(1)} GB</span></div>
+      <div class="stat"><span>Available</span><span class="stat-value">${(m.available_mb/1024).toFixed(1)} GB</span></div>
+    `;
+    document.getElementById('mem-bar').style.width = m.usage_percent.toFixed(1) + '%';
+    document.getElementById('mem-bar').className = 'bar-fill ' + barColor(m.usage_percent);
+    document.getElementById('mem-label').textContent = m.usage_percent.toFixed(1) + '%';
+    document.getElementById('swap-details').innerHTML = `
+      <div class="stat"><span>Total</span><span class="stat-value">${(m.swap_total_mb/1024).toFixed(1)} GB</span></div>
+      <div class="stat"><span>Used</span><span class="stat-value">${(m.swap_used_mb/1024).toFixed(1)} GB</span></div>
+    `;
+    document.getElementById('swap-bar').style.width = m.swap_usage_percent.toFixed(1) + '%';
+    document.getElementById('swap-label').textContent = m.swap_usage_percent.toFixed(1) + '%';
+  } catch (e) { console.error('mem:', e); }
+}
+
+async function refreshDisks() {
+  try {
+    const disks = await invoke('get_disk_info');
+    document.getElementById('disk-table').innerHTML = disks.map(d => `<tr>
+      <td>${d.name}</td><td>${d.mount_point}</td><td>${d.fs_type}</td>
+      <td>${d.total_gb.toFixed(1)} GB</td><td>${d.used_gb.toFixed(1)} GB</td><td>${d.available_gb.toFixed(1)} GB</td>
+      <td><div class="bar-container" style="height:16px;min-width:80px"><div class="bar-fill ${barColor(d.usage_percent)}" style="width:${d.usage_percent.toFixed(1)}%"></div><span class="bar-label" style="font-size:10px">${d.usage_percent.toFixed(1)}%</span></div></td>
+    </tr>`).join('');
+
+    // Also update overview disk
+    document.getElementById('overview-disk').innerHTML = disks.map(d => `
+      <div class="stat"><span>${d.mount_point}</span><span class="stat-value">${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB</span></div>
+      <div class="bar-container" style="height:14px"><div class="bar-fill ${barColor(d.usage_percent)}" style="width:${d.usage_percent}%"></div><span class="bar-label" style="font-size:10px">${d.usage_percent.toFixed(1)}%</span></div>
+    `).join('');
+  } catch (e) { console.error('disks:', e); }
+}
+
+async function refreshNetwork() {
+  try {
+    const nets = await invoke('get_network_info');
+    document.getElementById('net-table').innerHTML = nets.map(n => `<tr>
+      <td>${n.name}</td>
+      <td><span class="net-badge rx">↓ ${formatBytes(n.received_bytes)}</span></td>
+      <td><span class="net-badge tx">↑ ${formatBytes(n.transmitted_bytes)}</span></td>
+      <td>${n.received_packets.toLocaleString()}</td>
+      <td>${n.transmitted_packets.toLocaleString()}</td>
+    </tr>`).join('');
+  } catch (e) { console.error('net:', e); }
+}
+
+async function refreshProcesses() {
+  try {
+    const procs = await invoke('get_process_list');
+    document.getElementById('proc-table').innerHTML = procs.slice(0, 30).map(p => `<tr>
+      <td>${p.pid}</td><td>${p.name}</td>
+      <td style="color:${p.cpu_percent > 50 ? 'var(--red)' : p.cpu_percent > 20 ? 'var(--yellow)' : 'var(--accent)'}">${p.cpu_percent.toFixed(1)}%</td>
+      <td>${p.memory_mb} MB</td><td>${p.status}</td>
+    </tr>`).join('');
+  } catch (e) { console.error('procs:', e); }
+}
+
+async function exportJSON() {
+  try {
+    const json = await invoke('export_report_json');
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'system-info-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+  } catch (e) { alert('Export failed: ' + e); }
+}
+
+async function exportHTML() {
+  try {
+    const html = await invoke('export_report_html');
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'system-info-' + new Date().toISOString().slice(0,10) + '.html'; a.click();
+  } catch (e) { alert('Export failed: ' + e); }
+}
+
+// ── Init & auto-refresh ──
+async function refreshAll() {
+  await Promise.all([refreshOverview(), refreshCPU(), refreshMemory(), refreshDisks(), refreshNetwork(), refreshProcesses()]);
+}
+
+refreshAll();
+setInterval(refreshAll, 3000);
+</script>
+</body>
+</html>
