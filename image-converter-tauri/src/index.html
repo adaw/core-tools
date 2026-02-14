@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Converter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>⚡ Image Converter</h1>
+      <p class="subtitle">Batch convert, resize & optimize images</p>
+    </header>
+
+    <div class="toolbar">
+      <button id="btn-add" class="btn btn-primary">+ Add Images</button>
+      <button id="btn-clear" class="btn btn-ghost">Clear All</button>
+      <div class="spacer"></div>
+      <span id="file-count" class="badge">0 files</span>
+    </div>
+
+    <div class="main-content">
+      <div class="sidebar">
+        <div class="panel">
+          <h3>Output Format</h3>
+          <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpg" selected>JPEG</option>
+            <option value="webp">WebP</option>
+            <option value="avif">AVIF</option>
+            <option value="bmp">BMP</option>
+            <option value="tiff">TIFF</option>
+            <option value="ico">ICO</option>
+            <option value="gif">GIF</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <h3>Quality <span id="quality-val">85</span>%</h3>
+          <input type="range" id="quality" min="1" max="100" value="85">
+        </div>
+
+        <div class="panel">
+          <h3>Resize</h3>
+          <div class="resize-row">
+            <input type="number" id="resize-w" placeholder="Width" min="1">
+            <span>×</span>
+            <input type="number" id="resize-h" placeholder="Height" min="1">
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="strip-meta" checked>
+            Strip metadata
+          </label>
+        </div>
+
+        <div class="panel">
+          <h3>Output Directory</h3>
+          <button id="btn-output" class="btn btn-secondary btn-full">Choose folder…</button>
+          <p id="output-path" class="path-display">Not selected</p>
+        </div>
+
+        <button id="btn-convert" class="btn btn-accent btn-full btn-large" disabled>
+          🚀 Convert All
+        </button>
+      </div>
+
+      <div class="content">
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-zone-inner">
+            <span class="drop-icon">🖼️</span>
+            <p>Drop images here or click "Add Images"</p>
+          </div>
+        </div>
+        <div id="image-grid" class="image-grid"></div>
+
+        <div id="preview-modal" class="modal hidden">
+          <div class="modal-content">
+            <button class="modal-close" id="modal-close">✕</button>
+            <h3 id="preview-title"></h3>
+            <div class="preview-container">
+              <div class="preview-box">
+                <span class="preview-label">Original</span>
+                <img id="preview-before" alt="Before">
+                <p id="preview-before-info"></p>
+              </div>
+              <div class="preview-box">
+                <span class="preview-label">Converted</span>
+                <img id="preview-after" alt="After">
+                <p id="preview-after-info"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="results" class="results hidden">
+          <h3>✅ Conversion Results</h3>
+          <div id="results-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
