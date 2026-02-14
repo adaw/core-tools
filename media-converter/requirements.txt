@@ -1,0 +1,2 @@
+# Build dependencies only — the app itself has zero pip dependencies
+pyinstaller>=6.0
