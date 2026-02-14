@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendar Sync</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>📅 Calendar Sync</h1>
+      <nav class="tabs">
+        <button class="tab active" data-tab="sources">Sources</button>
+        <button class="tab" data-tab="sync">Sync</button>
+        <button class="tab" data-tab="log">Log</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Sources Tab -->
+      <section id="tab-sources" class="tab-content active">
+        <div class="panel">
+          <h2>Calendar Sources</h2>
+          <div class="source-grid">
+            <button class="source-btn" id="btn-google">
+              <span class="icon">🔵</span> Google Calendar
+            </button>
+            <button class="source-btn" id="btn-outlook">
+              <span class="icon">🟦</span> Outlook
+            </button>
+            <button class="source-btn" id="btn-caldav">
+              <span class="icon">🟢</span> CalDAV
+            </button>
+            <button class="source-btn" id="btn-ics">
+              <span class="icon">📄</span> ICS File
+            </button>
+          </div>
+          <div id="caldav-form" class="form hidden">
+            <h3>Add CalDAV Source</h3>
+            <input type="text" id="caldav-url" placeholder="CalDAV URL" />
+            <input type="text" id="caldav-user" placeholder="Username" />
+            <input type="password" id="caldav-pass" placeholder="Password" />
+            <button id="caldav-connect" class="btn-primary">Connect</button>
+          </div>
+          <div id="sources-list" class="list">
+            <p class="placeholder">No sources configured yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sync Tab -->
+      <section id="tab-sync" class="tab-content">
+        <div class="panel">
+          <h2>Sync Settings</h2>
+          <div class="sync-options">
+            <label class="option">
+              <input type="checkbox" id="opt-two-way" checked />
+              <span>Two-way sync</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" id="opt-dedup" checked />
+              <span>Deduplicate events</span>
+            </label>
+            <label class="option">
+              <input type="checkbox" id="opt-auto" />
+              <span>Auto-schedule sync</span>
+            </label>
+            <div class="select-group">
+              <label>Conflict resolution:</label>
+              <select id="conflict-strategy">
+                <option value="newest">Keep newest</option>
+                <option value="source">Source wins</option>
+                <option value="target">Target wins</option>
+                <option value="ask">Ask every time</option>
+              </select>
+            </div>
+            <div class="select-group" id="auto-interval-group" style="display:none">
+              <label>Sync interval:</label>
+              <select id="sync-interval">
+                <option value="5">Every 5 min</option>
+                <option value="15" selected>Every 15 min</option>
+                <option value="30">Every 30 min</option>
+                <option value="60">Every hour</option>
+              </select>
+            </div>
+          </div>
+          <div class="sync-actions">
+            <button id="btn-sync-now" class="btn-primary">⚡ Sync Now</button>
+            <button id="btn-sync-preview" class="btn-secondary">👁 Preview Changes</button>
+          </div>
+          <div id="sync-status" class="status-box hidden"></div>
+          <div id="sync-preview" class="list hidden"></div>
+        </div>
+      </section>
+
+      <!-- Log Tab -->
+      <section id="tab-log" class="tab-content">
+        <div class="panel">
+          <h2>Change Log</h2>
+          <div class="log-controls">
+            <button id="btn-refresh-log" class="btn-secondary">🔄 Refresh</button>
+            <button id="btn-clear-log" class="btn-secondary">🗑 Clear</button>
+          </div>
+          <div id="log-entries" class="list">
+            <p class="placeholder">No log entries yet.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

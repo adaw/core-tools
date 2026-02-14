@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nickelpack/tauri-apps-tauri/refs/heads/dev/crates/tauri-cli/schema.json",
+  "productName": "Calendar Sync",
+  "version": "1.0.0",
+  "identifier": "com.core-tools.calendar-sync",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Calendar Sync",
+        "width": 900,
+        "height": 700,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "dialog": {},
+    "fs": {
+      "scope": ["**"]
+    }
+  }
+}
