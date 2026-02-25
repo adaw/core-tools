@@ -1,5 +1,0 @@
-/Users/lex/repos/core-tools/calendar-sync-tauri/src-tauri/target/debug/deps/smallvec-db281bbbd233aa68.d: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smallvec-1.15.1/src/lib.rs
-
-/Users/lex/repos/core-tools/calendar-sync-tauri/src-tauri/target/debug/deps/libsmallvec-db281bbbd233aa68.rmeta: /Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smallvec-1.15.1/src/lib.rs
-
-/Users/lex/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/smallvec-1.15.1/src/lib.rs:
