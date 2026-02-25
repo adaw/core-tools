@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORE Image Converter</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-icon">◆</span>
+      <span class="logo-text">CORE</span>
+      <span class="logo-sub">Image Converter</span>
+    </div>
+    <div class="header-stats" id="headerStats"></div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="app-main">
+    <!-- Sidebar: Settings -->
+    <aside class="sidebar">
+      <section class="panel">
+        <h3 class="panel-title">Output Format</h3>
+        <div class="format-grid" id="formatGrid">
+          <button class="format-btn active" data-format="PNG">PNG</button>
+          <button class="format-btn" data-format="JPEG">JPG</button>
+          <button class="format-btn" data-format="WEBP">WebP</button>
+          <button class="format-btn" data-format="AVIF">AVIF</button>
+          <button class="format-btn" data-format="BMP">BMP</button>
+          <button class="format-btn" data-format="TIFF">TIFF</button>
+          <button class="format-btn" data-format="ICO">ICO</button>
+          <button class="format-btn" data-format="GIF">GIF</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3 class="panel-title">Quality <span class="quality-value" id="qualityValue">85</span></h3>
+        <input type="range" class="slider" id="qualitySlider" min="1" max="100" value="85" />
+        <div class="size-estimate" id="sizeEstimate">Select an image to estimate</div>
+      </section>
+
+      <section class="panel">
+        <h3 class="panel-title">Resize</h3>
+        <select class="select" id="resizeMode">
+          <option value="none">No Resize</option>
+          <option value="percent">By Percentage</option>
+          <option value="pixels">Exact Pixels</option>
+          <option value="fit">Fit Within</option>
+        </select>
+        <div class="resize-inputs hidden" id="resizeInputs">
+          <div class="resize-percent hidden" id="resizePercent">
+            <label>Scale</label>
+            <div class="input-group">
+              <input type="number" id="resizePct" value="50" min="1" max="1000" />
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+          <div class="resize-pixels hidden" id="resizePixels">
+            <div class="input-row">
+              <div class="input-group">
+                <label>Width</label>
+                <input type="number" id="resizeW" placeholder="px" min="1" />
+              </div>
+              <span class="input-x">×</span>
+              <div class="input-group">
+                <label>Height</label>
+                <input type="number" id="resizeH" placeholder="px" min="1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3 class="panel-title">Options</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" id="stripMeta" checked />
+          <span class="checkmark"></span>
+          Strip metadata
+        </label>
+      </section>
+
+      <section class="panel">
+        <h3 class="panel-title">Output</h3>
+        <div class="output-folder" id="outputFolder" title="Click to change">
+          <span class="folder-icon">📁</span>
+          <span class="folder-path" id="folderPath">Select output folder…</span>
+        </div>
+        <div class="input-group" style="margin-top: 8px">
+          <label>Filename Template</label>
+          <input type="text" id="filenameTemplate" value="{name}" placeholder="{name}_{index}" class="text-input" />
+          <div class="template-help">{name} {index} {format} {width} {height}</div>
+        </div>
+      </section>
+
+      <button class="convert-btn" id="convertBtn" disabled>
+        <span class="convert-icon">⚡</span>
+        Convert All
+      </button>
+    </aside>
+
+    <!-- Content area -->
+    <div class="content">
+      <!-- Drop zone (shown when no images) -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-inner">
+          <div class="drop-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <h2 class="drop-title">Drop images here</h2>
+          <p class="drop-subtitle">or click to browse • PNG, JPG, WebP, AVIF, BMP, TIFF, ICO, GIF</p>
+        </div>
+      </div>
+
+      <!-- Image grid -->
+      <div class="image-grid hidden" id="imageGrid"></div>
+
+      <!-- Before/After Preview Modal -->
+      <div class="preview-overlay hidden" id="previewOverlay">
+        <div class="preview-modal">
+          <button class="preview-close" id="previewClose">✕</button>
+          <h3 class="preview-title" id="previewTitle">Preview</h3>
+          <div class="preview-container">
+            <div class="preview-side">
+              <div class="preview-label">Original</div>
+              <img id="previewOriginal" />
+              <div class="preview-info" id="previewOrigInfo"></div>
+            </div>
+            <div class="preview-divider">→</div>
+            <div class="preview-side">
+              <div class="preview-label">Converted</div>
+              <img id="previewConverted" />
+              <div class="preview-info" id="previewConvInfo"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-bar hidden" id="progressBar">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 0</div>
+      </div>
+
+      <!-- Results -->
+      <div class="results hidden" id="results">
+        <h3 class="results-title">Conversion Complete</h3>
+        <div class="results-summary" id="resultsSummary"></div>
+        <div class="results-list" id="resultsList"></div>
+      </div>
+    </div>
+  </main>
+
+  <input type="file" id="fileInput" multiple accept="image/*" style="display:none" />
+  <script src="js/app.js"></script>
+</body>
+</html>

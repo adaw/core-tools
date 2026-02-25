@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORE Media Converter</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- FFmpeg Warning Banner -->
+  <div id="ffmpeg-warning" class="warning-banner hidden">
+    <span>⚠️ FFmpeg not found in PATH.</span>
+    <a href="https://ffmpeg.org/download.html" target="_blank">Download FFmpeg →</a>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 32 32" width="28" height="28">
+          <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00ff88" stroke-width="2"/>
+          <polygon points="16,8 24,12.5 24,21.5 16,26 8,21.5 8,12.5" fill="#00ff8830" stroke="#00ff88" stroke-width="1.5"/>
+          <circle cx="16" cy="16" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">CORE</span>
+        <span class="product">Media Converter</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="ffmpeg-status" id="ffmpeg-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Checking FFmpeg...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Left Panel: Drop Zone & File List -->
+    <section class="panel-left">
+      <!-- Drop Zone -->
+      <div id="drop-zone" class="drop-zone">
+        <div class="drop-zone-content">
+          <div class="drop-icon">
+            <svg viewBox="0 0 64 64" width="48" height="48">
+              <rect x="8" y="20" width="48" height="36" rx="4" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.5"/>
+              <path d="M32 12 L32 40" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M22 22 L32 12 L42 22" stroke="#00ff88" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="drop-text">Drop media files here</p>
+          <p class="drop-subtext">or click to browse</p>
+          <div class="supported-formats">
+            MP4 · MKV · AVI · MOV · WebM · MP3 · WAV · FLAC · AAC · OGG
+          </div>
+        </div>
+        <div class="drop-zone-glow"></div>
+        <input type="file" id="file-input" multiple accept="video/*,audio/*,.mkv,.avi,.mov,.webm,.flac,.ogg,.aac" />
+      </div>
+
+      <!-- File List -->
+      <div id="file-list" class="file-list">
+        <div class="file-list-header">
+          <h3>Files <span id="file-count" class="badge">0</span></h3>
+          <button id="clear-all-btn" class="btn-ghost" title="Clear all">✕ Clear</button>
+        </div>
+        <div id="file-items" class="file-items"></div>
+      </div>
+    </section>
+
+    <!-- Right Panel: Settings & Convert -->
+    <section class="panel-right">
+      <!-- Output Format -->
+      <div class="settings-section">
+        <h3 class="section-title">Output Format</h3>
+        <div class="format-tabs">
+          <button class="format-tab active" data-type="video">🎬 Video</button>
+          <button class="format-tab" data-type="audio">🎵 Audio</button>
+        </div>
+        <div id="format-grid" class="format-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quality Preset -->
+      <div class="settings-section">
+        <h3 class="section-title">Quality</h3>
+        <div class="quality-presets">
+          <button class="preset-btn" data-quality="high">
+            <span class="preset-icon">💎</span>
+            <span class="preset-label">High</span>
+          </button>
+          <button class="preset-btn active" data-quality="medium">
+            <span class="preset-icon">⚖️</span>
+            <span class="preset-label">Medium</span>
+          </button>
+          <button class="preset-btn" data-quality="low">
+            <span class="preset-icon">⚡</span>
+            <span class="preset-label">Low</span>
+          </button>
+          <button class="preset-btn" data-quality="custom">
+            <span class="preset-icon">🔧</span>
+            <span class="preset-label">Custom</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom Options (hidden by default) -->
+      <div id="custom-options" class="settings-section custom-options hidden">
+        <h3 class="section-title">Custom Options</h3>
+        <div class="options-grid">
+          <div class="option-group">
+            <label>Codec</label>
+            <input type="text" id="opt-codec" placeholder="e.g. libx264, aac" class="input-field" />
+          </div>
+          <div class="option-group">
+            <label>Bitrate</label>
+            <input type="text" id="opt-bitrate" placeholder="e.g. 5M, 192k" class="input-field" />
+          </div>
+          <div class="option-group">
+            <label>Resolution</label>
+            <input type="text" id="opt-resolution" placeholder="e.g. 1920x1080" class="input-field" />
+          </div>
+          <div class="option-group">
+            <label>Sample Rate</label>
+            <input type="text" id="opt-samplerate" placeholder="e.g. 44100, 48000" class="input-field" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Directory -->
+      <div class="settings-section">
+        <h3 class="section-title">Output Folder</h3>
+        <div class="output-dir-row">
+          <div class="output-path" id="output-path" title="Click to change">
+            ~/Desktop
+          </div>
+          <button id="choose-dir-btn" class="btn-secondary">Browse</button>
+        </div>
+      </div>
+
+      <!-- Convert Button -->
+      <button id="convert-btn" class="btn-convert" disabled>
+        <span class="btn-convert-icon">⚡</span>
+        <span class="btn-convert-text">Convert All</span>
+      </button>
+    </section>
+  </main>
+
+  <!-- Progress Overlay -->
+  <div id="progress-overlay" class="progress-overlay hidden">
+    <div class="progress-panel">
+      <div class="progress-header">
+        <h2>Converting...</h2>
+        <button id="cancel-all-btn" class="btn-ghost btn-cancel">Cancel All</button>
+      </div>
+      <div id="progress-items" class="progress-items"></div>
+      <div class="progress-footer">
+        <div class="overall-progress">
+          <div class="overall-bar">
+            <div id="overall-fill" class="overall-fill"></div>
+          </div>
+          <span id="overall-text" class="overall-text">0%</span>
+        </div>
+        <button id="done-btn" class="btn-convert hidden">
+          <span class="btn-convert-icon">✓</span>
+          <span class="btn-convert-text">Done</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

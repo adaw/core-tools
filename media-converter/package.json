@@ -1,0 +1,16 @@
+{
+  "name": "media-converter",
+  "version": "1.0.0",
+  "description": "**Beautiful batch media converter** powered by FFmpeg and built with Tauri 2 (Rust + HTML/CSS/JS).",
+  "main": "index.js",
+  "scripts": {
+    "tauri": "tauri",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.0"
+  }
+}

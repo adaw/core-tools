@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORE Flasher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <h1>CORE <span class="accent">Flasher</span></h1>
+      </div>
+      <p class="subtitle">USB Bootable Disk Creator</p>
+    </header>
+
+    <!-- Step Indicator -->
+    <div class="steps">
+      <div class="step active" data-step="1"><span class="step-num">1</span> Select Image</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2"><span class="step-num">2</span> Select Drive</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3"><span class="step-num">3</span> Flash!</div>
+    </div>
+
+    <!-- Step 1: Select Image -->
+    <div class="panel" id="step1">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">📀</div>
+        <p>Drop an image file here or click to browse</p>
+        <p class="hint">Supports: ISO, IMG, DMG, ZIP</p>
+        <input type="file" id="fileInput" accept=".iso,.img,.dmg,.zip" hidden>
+      </div>
+      <div id="imageInfo" class="info-box" style="display:none">
+        <div class="info-row"><span class="label">File:</span> <span id="imageName">—</span></div>
+        <div class="info-row"><span class="label">Size:</span> <span id="imageSize">—</span></div>
+        <div class="info-row"><span class="label">Format:</span> <span id="imageFormat">—</span></div>
+        <div class="hash-section">
+          <button onclick="computeHash('sha256')" class="btn-sm">SHA256</button>
+          <button onclick="computeHash('md5')" class="btn-sm">MD5</button>
+          <span id="hashResult" class="hash-result"></span>
+        </div>
+      </div>
+      <button class="btn btn-next" id="btnNext1" disabled onclick="goToStep(2)">Next →</button>
+    </div>
+
+    <!-- Step 2: Select Drive -->
+    <div class="panel" id="step2" style="display:none">
+      <div class="drive-header">
+        <h2>Select Target USB Drive</h2>
+        <button onclick="refreshDrives()" class="btn-sm">🔄 Refresh</button>
+      </div>
+      <div id="driveList" class="drive-list">
+        <p class="hint">Scanning for USB drives...</p>
+      </div>
+      <div class="warning-box" id="warningBox" style="display:none">
+        ⚠️ <strong>WARNING:</strong> All data on the selected drive will be permanently erased!
+      </div>
+      <div class="options">
+        <label><input type="checkbox" id="verifyCheck" checked> Verify after writing (byte-by-byte)</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-next" id="btnNext2" disabled onclick="goToStep(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Flash -->
+    <div class="panel" id="step3" style="display:none">
+      <div class="flash-summary">
+        <div class="summary-row">
+          <span class="label">Image:</span> <span id="summaryImage">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Drive:</span> <span id="summaryDrive">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Verify:</span> <span id="summaryVerify">Yes</span>
+        </div>
+      </div>
+
+      <!-- Progress Circle -->
+      <div class="progress-container" id="progressContainer" style="display:none">
+        <svg class="progress-ring" viewBox="0 0 200 200">
+          <circle class="progress-bg" cx="100" cy="100" r="85" />
+          <circle class="progress-bar" cx="100" cy="100" r="85" id="progressCircle" />
+        </svg>
+        <div class="progress-text">
+          <div id="progressPercent" class="progress-percent">0%</div>
+          <div id="progressPhase" class="progress-phase">Preparing...</div>
+          <div id="progressSpeed" class="progress-speed"></div>
+          <div id="progressEta" class="progress-eta"></div>
+        </div>
+      </div>
+
+      <div class="btn-row" id="flashButtons">
+        <button class="btn btn-back" onclick="goToStep(2)">← Back</button>
+        <button class="btn btn-flash" id="btnFlash" onclick="startFlash()">⚡ Flash!</button>
+      </div>
+      <div class="btn-row" id="cancelBtn" style="display:none">
+        <button class="btn btn-cancel" onclick="cancelFlash()">✕ Cancel</button>
+      </div>
+      <div id="doneMessage" style="display:none" class="done-box">
+        ✅ <strong>Flash complete!</strong> You can safely remove the USB drive.
+        <button class="btn" onclick="resetApp()" style="margin-top:12px">Flash Another</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

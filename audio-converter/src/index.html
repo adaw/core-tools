@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORE Audio Converter & Editor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">♫</span>
+      <span class="logo-text">CORE <span class="accent">Audio</span></span>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="convert">Convert</button>
+      <button class="tab" data-tab="edit">Edit</button>
+      <button class="tab" data-tab="metadata">Metadata</button>
+      <button class="tab" data-tab="batch">Batch</button>
+    </nav>
+  </header>
+
+  <!-- Drop Zone -->
+  <div id="dropZone" class="drop-zone">
+    <div class="drop-content">
+      <div class="drop-icon">🎵</div>
+      <p>Drop audio files here or <button id="btnBrowse" class="link-btn">browse</button></p>
+      <p class="drop-hint">MP3, WAV, FLAC, AAC, OGG, WMA, AIFF, M4A</p>
+    </div>
+  </div>
+
+  <!-- File Info Bar -->
+  <div id="fileInfo" class="file-info hidden">
+    <div class="file-name" id="fileName">—</div>
+    <div class="file-details" id="fileDetails">—</div>
+    <button id="btnRemoveFile" class="icon-btn" title="Remove file">✕</button>
+  </div>
+
+  <!-- Waveform -->
+  <div id="waveformContainer" class="waveform-container hidden">
+    <canvas id="waveformCanvas"></canvas>
+    <div class="waveform-overlay">
+      <div id="playhead" class="playhead"></div>
+      <div id="selection" class="selection hidden"></div>
+    </div>
+    <div class="waveform-time">
+      <span id="timeStart">0:00</span>
+      <span id="timeCurrent">0:00</span>
+      <span id="timeEnd">0:00</span>
+    </div>
+    <div class="waveform-controls">
+      <button id="zoomIn" class="sm-btn">+</button>
+      <button id="zoomOut" class="sm-btn">−</button>
+      <span id="zoomLevel" class="zoom-label">1x</span>
+    </div>
+  </div>
+
+  <!-- Transport -->
+  <div id="transport" class="transport hidden">
+    <button id="btnStop" class="transport-btn">⏹</button>
+    <button id="btnPlay" class="transport-btn primary">▶</button>
+    <button id="btnPause" class="transport-btn">⏸</button>
+    <div class="volume-ctrl">
+      <span>🔊</span>
+      <input type="range" id="volume" min="0" max="1" step="0.05" value="1">
+    </div>
+  </div>
+
+  <!-- Tab Panels -->
+  <main class="panels">
+    <!-- Convert Panel -->
+    <section id="panel-convert" class="panel active">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Output Format</label>
+          <select id="convertFormat">
+            <option value="mp3">MP3</option>
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+            <option value="aac">AAC</option>
+            <option value="ogg">OGG</option>
+            <option value="wma">WMA</option>
+            <option value="aiff">AIFF</option>
+            <option value="m4a">M4A</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bitrate</label>
+          <select id="convertBitrate">
+            <option value="">Auto</option>
+            <option value="64k">64 kbps</option>
+            <option value="128k">128 kbps</option>
+            <option value="192k">192 kbps</option>
+            <option value="256k">256 kbps</option>
+            <option value="320k">320 kbps</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sample Rate</label>
+          <select id="convertSampleRate">
+            <option value="">Auto</option>
+            <option value="22050">22050 Hz</option>
+            <option value="44100">44100 Hz</option>
+            <option value="48000">48000 Hz</option>
+            <option value="96000">96000 Hz</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Channels</label>
+          <select id="convertChannels">
+            <option value="">Auto</option>
+            <option value="1">Mono</option>
+            <option value="2">Stereo</option>
+          </select>
+        </div>
+      </div>
+      <button id="btnConvert" class="action-btn" disabled>Convert</button>
+    </section>
+
+    <!-- Edit Panel -->
+    <section id="panel-edit" class="panel">
+      <div class="edit-ops">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Operation</label>
+            <select id="editOp">
+              <option value="trim">Trim / Cut</option>
+              <option value="fade_in">Fade In</option>
+              <option value="fade_out">Fade Out</option>
+              <option value="normalize">Normalize Volume</option>
+            </select>
+          </div>
+          <div class="form-group" id="trimStartGroup">
+            <label>Start (sec)</label>
+            <input type="number" id="editStart" step="0.1" min="0" placeholder="0.0">
+          </div>
+          <div class="form-group" id="trimEndGroup">
+            <label>End (sec)</label>
+            <input type="number" id="editEnd" step="0.1" min="0" placeholder="—">
+          </div>
+          <div class="form-group" id="fadeDurGroup">
+            <label>Duration (sec)</label>
+            <input type="number" id="fadeDur" step="0.1" min="0.1" value="2.0">
+          </div>
+        </div>
+        <button id="btnEdit" class="action-btn" disabled>Apply Edit</button>
+      </div>
+      <hr class="divider">
+      <div class="merge-section">
+        <h3>Merge Files</h3>
+        <div id="mergeList" class="merge-list">
+          <p class="placeholder">Add files to merge...</p>
+        </div>
+        <div class="merge-actions">
+          <button id="btnMergeAdd" class="sm-btn">+ Add File</button>
+          <button id="btnMerge" class="action-btn" disabled>Merge All</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metadata Panel -->
+    <section id="panel-metadata" class="panel">
+      <div class="form-grid meta-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="metaTitle" placeholder="Track title">
+        </div>
+        <div class="form-group">
+          <label>Artist</label>
+          <input type="text" id="metaArtist" placeholder="Artist name">
+        </div>
+        <div class="form-group">
+          <label>Album</label>
+          <input type="text" id="metaAlbum" placeholder="Album name">
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="text" id="metaYear" placeholder="2024">
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <input type="text" id="metaGenre" placeholder="Genre">
+        </div>
+      </div>
+      <button id="btnSaveMeta" class="action-btn" disabled>Save Metadata</button>
+    </section>
+
+    <!-- Batch Panel -->
+    <section id="panel-batch" class="panel">
+      <div class="batch-top">
+        <button id="btnBatchAdd" class="sm-btn">+ Add Files</button>
+        <div class="form-group inline">
+          <label>Convert to:</label>
+          <select id="batchFormat">
+            <option value="mp3">MP3</option>
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+            <option value="aac">AAC</option>
+            <option value="ogg">OGG</option>
+            <option value="m4a">M4A</option>
+          </select>
+        </div>
+        <button id="btnBatchConvert" class="action-btn" disabled>Convert All</button>
+      </div>
+      <div id="batchList" class="batch-list">
+        <p class="placeholder">No files added for batch conversion.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Progress Bar -->
+  <div id="progressBar" class="progress-bar hidden">
+    <div class="progress-track">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <span id="progressText" class="progress-text">0%</span>
+  </div>
+
+  <!-- Status -->
+  <footer class="status-bar">
+    <span id="statusText">Ready</span>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

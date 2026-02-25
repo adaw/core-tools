@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBook Converter — CORE Tools</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">📚</span>
+        <h1>eBook <span class="accent">Converter</span></h1>
+        <span class="badge">CORE #11</span>
+      </div>
+      <div class="header-actions">
+        <div id="calibre-status" class="status-dot"></div>
+        <button class="btn btn-ghost" onclick="showTab('convert')">Convert</button>
+        <button class="btn btn-ghost" onclick="showTab('metadata')">Metadata</button>
+        <button class="btn btn-ghost" onclick="showTab('settings')">Settings</button>
+      </div>
+    </header>
+
+    <!-- Drop Zone Overlay -->
+    <div id="drop-overlay" class="drop-overlay hidden">
+      <div class="drop-content">
+        <div class="drop-icon">📖</div>
+        <p>Drop eBooks here</p>
+        <span class="drop-formats">EPUB · MOBI · PDF · AZW3 · FB2 · TXT · HTML · DOCX</span>
+      </div>
+    </div>
+
+    <!-- Tab: Convert -->
+    <main id="tab-convert" class="tab active">
+      <div class="convert-layout">
+        <!-- File List -->
+        <section class="file-panel">
+          <div class="panel-header">
+            <h2>Books</h2>
+            <button class="btn btn-primary" id="btn-add-files">
+              <span>+</span> Add Files
+            </button>
+          </div>
+          <div id="book-grid" class="book-grid">
+            <div class="empty-state" id="empty-state">
+              <div class="empty-icon">📂</div>
+              <p>Drag & drop eBooks here</p>
+              <p class="subtle">or click "Add Files"</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Conversion Panel -->
+        <aside class="convert-panel">
+          <h2>Output</h2>
+          <div class="form-group">
+            <label>Format</label>
+            <select id="output-format" class="select">
+              <option value="epub">EPUB</option>
+              <option value="mobi">MOBI</option>
+              <option value="pdf">PDF</option>
+              <option value="azw3">AZW3</option>
+              <option value="fb2">FB2</option>
+              <option value="txt">TXT</option>
+              <option value="html">HTML</option>
+              <option value="docx">DOCX</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Output Folder</label>
+            <div class="input-row">
+              <input type="text" id="output-dir" class="input" placeholder="Same as input" readonly />
+              <button class="btn btn-ghost" id="btn-pick-dir">📁</button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <h3>Layout Options</h3>
+          <div class="options-grid">
+            <div class="form-group">
+              <label>Page Size</label>
+              <select id="opt-page-size" class="select">
+                <option value="">Default</option>
+                <option value="a4">A4</option>
+                <option value="a5">A5</option>
+                <option value="letter">Letter</option>
+                <option value="b5">B5</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Font Size</label>
+              <input type="number" id="opt-font-size" class="input" placeholder="Auto" min="6" max="72" />
+            </div>
+            <div class="form-group">
+              <label>Line Height</label>
+              <input type="number" id="opt-line-height" class="input" placeholder="Auto" step="0.1" min="0.5" max="3" />
+            </div>
+            <div class="form-group">
+              <label>Margins (pt)</label>
+              <div class="margin-inputs">
+                <input type="number" id="opt-margin-top" class="input mini" placeholder="T" />
+                <input type="number" id="opt-margin-bottom" class="input mini" placeholder="B" />
+                <input type="number" id="opt-margin-left" class="input mini" placeholder="L" />
+                <input type="number" id="opt-margin-right" class="input mini" placeholder="R" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-no-images" />
+              Strip images
+            </label>
+          </div>
+
+          <div class="divider"></div>
+
+          <button class="btn btn-accent btn-lg" id="btn-convert">
+            ⚡ Convert All
+          </button>
+
+          <!-- Progress -->
+          <div id="progress-area" class="progress-area hidden"></div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Tab: Metadata -->
+    <main id="tab-metadata" class="tab">
+      <div class="metadata-layout">
+        <div class="meta-sidebar">
+          <div id="meta-cover" class="meta-cover">
+            <div class="meta-cover-placeholder">No cover</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-extract-cover">Extract Cover</button>
+          <button class="btn btn-ghost btn-sm" id="btn-replace-cover">Replace Cover</button>
+        </div>
+        <div class="meta-form">
+          <h2>Metadata Editor</h2>
+          <p class="subtle" id="meta-file-label">Select a book from the Convert tab first</p>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="meta-title" class="input" placeholder="Book title" />
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" id="meta-author" class="input" placeholder="Author name" />
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input type="text" id="meta-language" class="input" placeholder="en, cs, de..." />
+          </div>
+          <div class="form-group">
+            <label>Publisher</label>
+            <input type="text" id="meta-publisher" class="input" placeholder="Publisher" />
+          </div>
+          <div class="form-group">
+            <label>Tags</label>
+            <input type="text" id="meta-tags" class="input" placeholder="fiction, sci-fi, ..." />
+          </div>
+          <div class="form-group">
+            <label>Series</label>
+            <div class="input-row">
+              <input type="text" id="meta-series" class="input" placeholder="Series name" />
+              <input type="number" id="meta-series-index" class="input mini" placeholder="#" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="meta-description" class="input textarea" placeholder="Book description..." rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label>ISBN</label>
+            <input type="text" id="meta-isbn" class="input" placeholder="ISBN" />
+          </div>
+          <button class="btn btn-accent" id="btn-save-meta">💾 Save Metadata</button>
+          <div id="meta-status" class="meta-status"></div>
+
+          <div class="divider"></div>
+          <h3>Table of Contents</h3>
+          <pre id="toc-preview" class="toc-preview">Select a book to preview TOC</pre>
+        </div>
+      </div>
+    </main>
+
+    <!-- Tab: Settings -->
+    <main id="tab-settings" class="tab">
+      <div class="settings-panel">
+        <h2>Settings</h2>
+        <div class="form-group">
+          <label>Calibre Path</label>
+          <input type="text" id="calibre-path" class="input" placeholder="Auto-detected" />
+          <p class="subtle">Leave empty for auto-detection (ebook-convert in PATH)</p>
+        </div>
+        <div class="form-group">
+          <label>Default Output Format</label>
+          <select id="default-format" class="select">
+            <option value="epub">EPUB</option>
+            <option value="mobi">MOBI</option>
+            <option value="pdf">PDF</option>
+            <option value="azw3">AZW3</option>
+          </select>
+        </div>
+        <div class="about">
+          <h3>About</h3>
+          <p>eBook Converter v0.1.0</p>
+          <p>CORE Tools #11</p>
+          <p class="subtle">Powered by Calibre CLI + Tauri 2</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

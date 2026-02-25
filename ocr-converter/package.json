@@ -1,0 +1,11 @@
+{
+  "name": "ocr-converter",
+  "version": "1.0.0",
+  "description": "CORE OCR & PDF↔Word Converter",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.0"
+  }
+}

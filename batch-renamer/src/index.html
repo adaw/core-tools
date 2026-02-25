@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORE Batch Renamer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">⬡</div>
+      <h1>CORE BATCH RENAMER</h1>
+      <span class="version">v1.0.0</span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-icon" id="btnUndo" title="Undo last rename (Ctrl+Z)" disabled>
+        <span class="icon">↩</span>
+      </button>
+      <div class="file-count" id="fileCount">0 files</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Left Panel: Controls -->
+    <aside class="panel controls-panel">
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-content">
+          <div class="drop-icon">📁</div>
+          <p>Drop files or folders here</p>
+          <p class="drop-hint">or use the buttons below</p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnAddFiles">
+          <span class="icon">📄</span> Add Files
+        </button>
+        <button class="btn btn-secondary" id="btnAddFolder">
+          <span class="icon">📂</span> Add Folder
+        </button>
+        <button class="btn btn-danger" id="btnClear">
+          <span class="icon">✕</span> Clear
+        </button>
+      </div>
+
+      <!-- Mode Tabs -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="find_replace">Find & Replace</button>
+        <button class="mode-tab" data-mode="numbering">Numbering</button>
+        <button class="mode-tab" data-mode="date_stamp">Date Stamp</button>
+        <button class="mode-tab" data-mode="extension">Extension</button>
+        <button class="mode-tab" data-mode="case_change">Case</button>
+        <button class="mode-tab" data-mode="regex">Regex</button>
+      </div>
+
+      <!-- Mode Panels -->
+      <div class="mode-panels">
+        <!-- Find & Replace -->
+        <div class="mode-panel active" data-panel="find_replace">
+          <div class="field">
+            <label>Find</label>
+            <input type="text" id="frFind" placeholder="Text to find..." spellcheck="false">
+          </div>
+          <div class="field">
+            <label>Replace with</label>
+            <input type="text" id="frReplace" placeholder="Replacement..." spellcheck="false">
+          </div>
+          <label class="checkbox">
+            <input type="checkbox" id="frRegex">
+            <span class="checkmark"></span>
+            Use regular expression
+          </label>
+        </div>
+
+        <!-- Numbering -->
+        <div class="mode-panel" data-panel="numbering">
+          <div class="field-row">
+            <div class="field">
+              <label>Prefix</label>
+              <input type="text" id="numPrefix" placeholder="file_" spellcheck="false">
+            </div>
+            <div class="field">
+              <label>Suffix</label>
+              <input type="text" id="numSuffix" placeholder="" spellcheck="false">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Start #</label>
+              <input type="number" id="numStart" value="1" min="0">
+            </div>
+            <div class="field">
+              <label>Padding</label>
+              <input type="number" id="numPadding" value="3" min="1" max="10">
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Stamp -->
+        <div class="mode-panel" data-panel="date_stamp">
+          <div class="field">
+            <label>Date format</label>
+            <input type="text" id="dateFormat" value="%Y-%m-%d" spellcheck="false">
+          </div>
+          <div class="field">
+            <label>Position</label>
+            <div class="radio-group">
+              <label class="radio"><input type="radio" name="datePos" value="prefix" checked><span>Prefix</span></label>
+              <label class="radio"><input type="radio" name="datePos" value="suffix"><span>Suffix</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Separator</label>
+            <input type="text" id="dateSep" value="_" spellcheck="false" style="width:60px">
+          </div>
+        </div>
+
+        <!-- Extension -->
+        <div class="mode-panel" data-panel="extension">
+          <div class="field">
+            <label>New extension</label>
+            <input type="text" id="extNew" placeholder=".txt" spellcheck="false" style="width:120px">
+          </div>
+          <p class="hint">e.g. .jpg, .png, .txt, .md</p>
+        </div>
+
+        <!-- Case -->
+        <div class="mode-panel" data-panel="case_change">
+          <div class="radio-group vertical">
+            <label class="radio"><input type="radio" name="caseType" value="lower" checked><span>lowercase</span></label>
+            <label class="radio"><input type="radio" name="caseType" value="upper"><span>UPPERCASE</span></label>
+            <label class="radio"><input type="radio" name="caseType" value="title"><span>Title Case</span></label>
+          </div>
+        </div>
+
+        <!-- Regex -->
+        <div class="mode-panel" data-panel="regex">
+          <div class="field">
+            <label>Pattern</label>
+            <input type="text" id="regPattern" placeholder="Regular expression..." spellcheck="false">
+          </div>
+          <div class="field">
+            <label>Replacement</label>
+            <input type="text" id="regReplace" placeholder="Replacement ($1, $2...)" spellcheck="false">
+          </div>
+          <div class="field">
+            <label>Apply to</label>
+            <div class="radio-group">
+              <label class="radio"><input type="radio" name="regScope" value="name" checked><span>Name only</span></label>
+              <label class="radio"><input type="radio" name="regScope" value="full"><span>Full filename</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn btn-primary btn-large" id="btnRename">
+        <span class="icon">✓</span> RENAME FILES
+      </button>
+    </aside>
+
+    <!-- Right Panel: Preview -->
+    <section class="panel preview-panel">
+      <div class="preview-header">
+        <h2>Live Preview</h2>
+        <span class="preview-stats" id="previewStats"></span>
+      </div>
+
+      <div class="preview-list" id="previewList">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">👀</div>
+          <p>Add files to see the preview</p>
+          <p class="hint">Changes will appear here in real-time</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Status Bar -->
+  <footer class="status-bar">
+    <span id="statusText">Ready — drop files or click Add Files</span>
+    <span class="shortcuts">
+      <kbd>Ctrl+Z</kbd> Undo
+      <kbd>Ctrl+Enter</kbd> Rename
+      <kbd>Del</kbd> Clear
+    </span>
+  </footer>
+
+  <!-- Confirmation Dialog -->
+  <div class="dialog-overlay" id="dialogOverlay">
+    <div class="dialog" id="confirmDialog">
+      <div class="dialog-icon">⚠️</div>
+      <h3 id="dialogTitle">Confirm Rename</h3>
+      <p id="dialogMessage">Rename 0 files?</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-secondary" id="dialogCancel">Cancel</button>
+        <button class="btn btn-primary" id="dialogConfirm">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Overlay -->
+  <div class="dialog-overlay" id="progressOverlay">
+    <div class="dialog">
+      <div class="dialog-icon spinning">⚡</div>
+      <h3>Renaming files...</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p id="progressText">Processing...</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

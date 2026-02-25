@@ -11,3 +11,8 @@ __pycache__/
 
 src-tauri/target/
 node_modules/
+node_modules/
+target/
+__pycache__/
+*.lock
+gen/

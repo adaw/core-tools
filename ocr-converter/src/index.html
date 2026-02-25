@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORE OCR & PDF↔Word Converter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">⬡</div>
+      <h1>CORE OCR CONVERTER</h1>
+      <span class="version">v1.0.0</span>
+    </div>
+    <div class="header-right">
+      <div class="dep-status" id="depStatus" title="Dependency status">
+        <span class="dep-dot" id="depDot">●</span>
+        <span id="depLabel">Checking…</span>
+      </div>
+      <div class="file-count" id="fileCount">0 files</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Left Panel: Controls -->
+    <aside class="panel controls-panel">
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-content">
+          <div class="drop-icon">📄</div>
+          <p>Drop files here</p>
+          <p class="drop-hint">PDF, DOCX, images (PNG, JPG, TIFF…)</p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnAddFiles">
+          <span class="icon">📄</span> Add Files
+        </button>
+        <button class="btn btn-danger" id="btnClear">
+          <span class="icon">✕</span> Clear
+        </button>
+      </div>
+
+      <!-- Mode Tabs -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="ocr">🔍 OCR</button>
+        <button class="mode-tab" data-mode="pdf2docx">PDF → Word</button>
+        <button class="mode-tab" data-mode="docx2pdf">Word → PDF</button>
+        <button class="mode-tab" data-mode="pdf2text">PDF → Text</button>
+        <button class="mode-tab" data-mode="img2pdf">Image → PDF</button>
+      </div>
+
+      <!-- OCR Options -->
+      <div class="mode-options" id="optOcr">
+        <h3>OCR Settings</h3>
+        <div class="form-group">
+          <label for="ocrLang">Language</label>
+          <select id="ocrLang">
+            <option value="eng">English</option>
+            <option value="ces">Czech (Čeština)</option>
+            <option value="deu">German (Deutsch)</option>
+            <option value="fra">French</option>
+            <option value="spa">Spanish</option>
+            <option value="ita">Italian</option>
+            <option value="pol">Polish</option>
+            <option value="rus">Russian</option>
+            <option value="eng+ces">English + Czech</option>
+            <option value="eng+deu">English + German</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="ocrBatch" /> Batch mode (all files)
+          </label>
+        </div>
+      </div>
+
+      <!-- PDF to Word options -->
+      <div class="mode-options hidden" id="optPdf2docx">
+        <h3>PDF → Word</h3>
+        <p class="hint">Extracts text and converts to DOCX format. Image-based PDFs will be flagged for OCR.</p>
+      </div>
+
+      <!-- Word to PDF options -->
+      <div class="mode-options hidden" id="optDocx2pdf">
+        <h3>Word → PDF</h3>
+        <p class="hint">Converts DOCX documents to PDF using LibreOffice.</p>
+      </div>
+
+      <!-- PDF to Text options -->
+      <div class="mode-options hidden" id="optPdf2text">
+        <h3>PDF → Text</h3>
+        <p class="hint">Extracts plain text from PDF files preserving layout.</p>
+      </div>
+
+      <!-- Images to PDF options -->
+      <div class="mode-options hidden" id="optImg2pdf">
+        <h3>Image → PDF</h3>
+        <p class="hint">Combines multiple images into a single multi-page PDF.</p>
+        <div class="form-group">
+          <label>Images will be combined in order shown.</label>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn btn-primary btn-large" id="btnConvert" disabled>
+        <span class="icon">⚡</span> <span id="btnConvertLabel">Convert</span>
+      </button>
+
+      <!-- Progress -->
+      <div class="progress-container hidden" id="progressContainer">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">Processing…</div>
+      </div>
+    </aside>
+
+    <!-- Right Panel: Preview / Results -->
+    <section class="panel preview-panel">
+      <div class="preview-tabs">
+        <button class="preview-tab active" data-preview="files">Files</button>
+        <button class="preview-tab" data-preview="result">Result</button>
+      </div>
+
+      <!-- File List -->
+      <div class="preview-content" id="previewFiles">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">📋</div>
+          <p>No files added yet</p>
+          <p class="hint">Drag & drop or use "Add Files" button</p>
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <!-- Result View -->
+      <div class="preview-content hidden" id="previewResult">
+        <div class="result-container" id="resultContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <p>Results will appear here</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Status Bar -->
+  <footer class="status-bar">
+    <span id="statusText">Ready</span>
+    <span id="statusRight"></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
